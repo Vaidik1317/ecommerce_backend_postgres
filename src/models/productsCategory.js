@@ -1,29 +1,36 @@
-const { Sequelize, DataTypes, Model } = require("sequelize");
-const sequelize = require("../db-connection");
+module.exports = (sequelize, Sequelize) => {
+  const productsCategory = sequelize.define(
+    "product_categories",
+    {
+      u_id: {
+        type: Sequelize.UUID,
+        allowNull: false,
+        unique: true,
+        defaultValue: Sequelize.UUIDV4,
+      },
 
-class ProductsCategory extends Model {}
-
-ProductsCategory.init(
-  {
-    category_id: {
-      type: DataTypes.UUID,
-      defaultValue: DataTypes.UUIDV4,
-      allowNull: false,
-      unique: true,
+      name: {
+        type: Sequelize.STRING,
+        allowNull: false,
+        unique: true,
+      },
     },
+    {
+      timestamps: true,
+      createdAt: "created_at",
+      updatedAt: "updated_at",
+      tableName: "product_categories",
+    }
+  );
 
-    name: {
-      type: DataTypes.STRING,
-      allowNull: false,
-      unique: true,
-    },
-  },
-  {
-    sequelize,
-    modelName: "ProductCategory",
-    tableName: "product_categories",
-    timestamps: true,
-  }
-);
+  // ProductsCategory.belongsTo(Products, { foreignKey: "category_id" });
+  // ProductsCategory.hasMany(Products, { foreignKey: "category_id" });
 
-module.exports = ProductsCategory;
+  productsCategory.associate = (models) => {
+    productsCategory.hasMany(models.product, {
+      foreignKey: "products_category_u_id",
+      sourceKey: "u_id",
+    });
+  };
+  return productsCategory;
+};

@@ -37,10 +37,13 @@ const createOrders = async (req, res) => {
       }
     }
 
+    const totalPrices = req.body.order_item.reduce((res, curr) => {
+      return res + Number(curr.price) * Number(curr.quantity);
+    }, 0);
     const createOrder = await order.create({
       user_u_id: req.body.user_u_id,
-      product_u_id: req.body.products_u_id,
-      total_price: req.body.total_price,
+      // product_u_id: req.body.products_u_id,
+      total_price: totalPrices,
       status: req.body.status,
       date: moment().format("DD/MM/YYYY"),
     });

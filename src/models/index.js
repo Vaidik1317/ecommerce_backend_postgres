@@ -1,17 +1,19 @@
-const sequelize = require("../db-connection");
-const Sequelize = require("sequelize");
+const { dBConnection, Sequelize } = require("../db-connection/index");
+// const sequelize = require("../db-connection");
+// const Sequelize = require("sequelize");
 
 const db = {};
-db.Sequelize = sequelize;
+// db.sequelize = dBConnection;
+db.sequelize = dBConnection;
 db.Sequelize = Sequelize;
 
-db.admin = require("./admin")(sequelize, Sequelize);
-db.category = require("./productsCategory")(sequelize, Sequelize);
-db.product = require("./products")(sequelize, Sequelize);
-db.gallary = require("./productsGallary")(sequelize, Sequelize);
-db.user = require("./user")(sequelize, Sequelize);
-db.order = require("./order")(sequelize, Sequelize);
-// db.items = require('./orderItems')(sequelize, Sequelize);
+db.admin = require("./admin")(dBConnection, Sequelize);
+db.category = require("./productsCategory")(dBConnection, Sequelize);
+db.product = require("./products")(dBConnection, Sequelize);
+db.gallery = require("./productsGallery")(dBConnection, Sequelize);
+db.user = require("./user")(dBConnection, Sequelize);
+db.order = require("./order")(dBConnection, Sequelize);
+db.items = require("./orderItems")(dBConnection, Sequelize);
 
 Object.keys(db).forEach((modelName) => {
   if ("associate" in db[modelName]) {
@@ -19,6 +21,4 @@ Object.keys(db).forEach((modelName) => {
   }
 });
 
-module.exports = {
-  db,
-};
+module.exports = { db };

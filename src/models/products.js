@@ -1,58 +1,58 @@
-const { Sequelize, DataTypes, Model } = require("sequelize");
-const sequelize = require("../db-connection");
+module.exports = (sequelize, Sequelize) => {
+  const products = sequelize.define(
+    "products",
+    {
+      u_id: {
+        type: Sequelize.UUID,
+        defaultValue: Sequelize.UUIDV4,
+        allowNull: false,
+        unique: true,
+      },
 
-const ProductsCategory = require("./productsCategory"); // Correct import
-const ProductsGallary = require("./productsGallary"); // Correct import
+      name: {
+        type: Sequelize.STRING,
+        allowNull: false,
+      },
 
-class Products extends Model {}
+      description: {
+        type: Sequelize.STRING,
+        allowNull: false,
+      },
 
-Products.init(
-  {
-    product_id: {
-      type: DataTypes.UUID,
-      defaultValue: DataTypes.UUIDV4,
-      allowNull: false,
-      unique: true,
-    },
+      price: {
+        type: Sequelize.INTEGER,
+        allowNull: false,
+      },
 
-    name: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-
-    description: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-
-    price: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-    },
-
-    quantity: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-    },
-
-    category_id: {
-      type: DataTypes.UUID,
-      references: {
-        model: ProductsCategory, // foreign key reference
-        key: "category_id",
+      quantity: {
+        type: Sequelize.INTEGER,
+        allowNull: false,
       },
     },
-  },
-  {
-    sequelize,
-    modelName: "Products",
-    tableName: "products",
-    timestamps: true,
-  }
-);
+    {
+      createdAt: "created_at",
+      updatedAt: "updated_at",
+      timestamps: true,
+      tableName: "products",
+    }
+  );
 
-// Define associations here
-Products.belongsTo(ProductsCategory, { foreignKey: "category_id" }); // Association with ProductsCategory
-Products.hasMany(ProductsGallary, { foreignKey: "product_id" }); // Association with ProductsGallary
+  products.associate = (models) => {
+    products.belongsTo(models.category, {
+      foreignKey: "products_category_u_id",
+      targetKey: "u_id",
+    });
 
-module.exports = Products;
+    products.hasMany(models.gallery, {
+      foreignKey: "products_u_id",
+      sourceKey: "u_id",
+    });
+
+    products.hasMany(models.items, {
+      foreignKey: "products_u_id",
+      sourceKey: "u_id",
+    });
+  };
+
+  return products;
+};

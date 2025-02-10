@@ -1,9 +1,11 @@
-const sequelize = require("../db-connection");
-// const sequelize = require("../models");
-// const sequelize = db.sequelize;
-
-const dbSync = async (req, res) => {
-  await sequelize.sync({ force: false, alter: true });
+const { db } = require("../models");
+// const sequelize = require("../db-connection");
+const dbSync = async () => {
+  try {
+    await db.sequelize.sync({ force: false, alter: true });
+  } catch (error) {
+    console.log("🚀 ~ dbSync ~ error:", error);
+  }
 };
 
-module.exports = dbSync;
+module.exports = { dbSync };

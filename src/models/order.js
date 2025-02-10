@@ -1,64 +1,59 @@
-const { Sequelize, DataTypes, Model } = require("sequelize");
-const sequelize = require("../db-connection");
-
-const Users = require("./user");
-const Products = require("./products");
-
-class Order extends Model {}
-
-Order.init(
-  {
-    order_id: {
-      type: DataTypes.UUID,
-      defaultValue: DataTypes.UUIDV4,
-      allowNull: false,
-      unique: true,
-    },
-
-    user_id: {
-      type: DataTypes.UUID,
-      allowNull: false,
-
-      references: {
-        model: Users, // foreign key
-        key: "user_id",
+module.exports = (sequelize, Sequelize) => {
+  const order = sequelize.define(
+    "order",
+    {
+      u_id: {
+        type: Sequelize.UUID,
+        defaultValue: Sequelize.UUIDV4,
+        allowNull: false,
+        unique: true,
       },
-    },
 
-    product_id: {
-      type: DataTypes.UUID,
-      allowNull: false,
-
-      references: {
-        model: Products,
-        key: "product_id",
+      total_price: {
+        type: Sequelize.INTEGER,
+        allowNull: false,
       },
+
+      status: {
+        type: Sequelize.ENUM,
+        values: ["pending", "accept", "reject"],
+        allowNull: false,
+      },
+
+      date: {
+        type: Sequelize.DATE,
+
+        allowNull: false,
+      },
+
+      // quantity: {
+      //   type: Sequelize.INTEGER,
+      //   allowNull: false,
+      // },
     },
-    // order_items: {
-    //   type: DataTypes.INTEGER,
-    //   allowNull: false,
+    {
+      createdAt: "created_at",
+      updatedAt: "updated_at",
+      timestamps: true,
+      tableName: "order",
+    }
+  );
 
-    //   references: {},
-    // },
+  order.associate = (models) => {
+    order.belongsTo(models.user, {
+      foreignKey: "user_u_id",
+      targetKey: "u_id",
+    });
 
-    total_price: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-    },
+    order.hasMany(models.items, {
+      foreignKey: "order_u_id",
+      sourceKey: "u_id",
+    });
+    // order.hasOne(models.user, {
+    //   foreignKey: "user_u_id",
+    //   sourceKey: "u_id",
+    // });
+  };
 
-    status: {
-      type: DataTypes.BOOLEAN,
-      allowNull: false,
-    },
-  },
-  {
-    sequelize,
-    modelName: "Order",
-    tableName: "order",
-  }
-);
-
-Order.belongsTo(Products, { foreignKey: "product_id" });
-Order.belongsTo(Users, { foreignKey: "user_id" });
-
-module.exports = Order;
+  return order;
+};

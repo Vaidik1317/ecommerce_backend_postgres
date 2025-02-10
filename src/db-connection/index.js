@@ -1,13 +1,23 @@
-const { Sequelize } = require("sequelize");
+const Sequelize = require("sequelize");
 
-const sequelize = new Sequelize("ecommerce", "postgres", "system123", {
-  host: "localhost",
+const proConfig = {
+  use_env_variable: "postgresql://postgres:system123@localhost:5432/ecommerce",
   dialect: "postgres",
-});
+  dialectOptions: {},
+  logging: false,
+};
 
-sequelize
-   .authenticate()
-   .then( ()=>console.log("connected to the database"))
-   .catch( (err)=> console.log('Unable to connect:', err));
+const dBConnection = new Sequelize(
+  "postgresql://postgres:system123@localhost:5432/ecommerce",
+  proConfig
+);
 
-module.exports = sequelize;
+// const sequelize = new Sequelize("ecommerce", "postgres", "system123", {
+//   host: "localhost",
+//   dialect: "postgres",
+// });
+module.exports = {
+  Sequelize,
+  dBConnection,
+};
+// module.exports = sequelize;

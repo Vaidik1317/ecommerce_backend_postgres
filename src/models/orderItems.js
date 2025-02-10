@@ -1,22 +1,47 @@
-const { sequelize, DataTypes, Model } = require("sequelize");
+module.exports = (sequelize, Sequelize) => {
+  const orderItems = sequelize.define(
+    "orderItems",
+    {
+      u_id: {
+        type: Sequelize.UUID,
+        defaultValue: Sequelize.UUIDV4,
+        unique: true,
+      },
 
-// cancel
-class OrderItems extends Model {}
-
-OrderItems.init({
-  items_id: {
-    type: DataTypes.UUID,
-    DefaultValue: DataTypes.UUIDV4,
-    unique: true,
-  },
-
-  order_id: {
-    type: DataTypes.UUID,
-    allowNull: false,
-
-    references: {
-      model: Ord,
-      key: "product_id",
+      price: {
+        type: Sequelize.INTEGER,
+        allowNull: false,
+      },
+      quantity: {
+        type: Sequelize.INTEGER,
+        allowNull: false,
+      },
     },
-  },
-});
+    {
+      createdAt: "created_at",
+      updatedAt: "updated_at",
+      timestamps: true,
+
+      tableName: "order_Items",
+    }
+  );
+
+  orderItems.associate = (models) => {
+    orderItems.belongsTo(models.order, {
+      foreignKey: "order_u_id",
+      targetKey: "u_id",
+    });
+
+    orderItems.belongsTo(models.product, {
+      foreignKey: "products_u_id",
+      targetKey: "u_id",
+    });
+
+    // orderItems.hasMany(models.product, {
+    //   foreignKey: "order_items_u_id",
+    //   sourceKey: "u_id",
+    // });
+  };
+
+  return orderItems;
+};

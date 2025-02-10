@@ -12,7 +12,7 @@ const getAdmin = async (req, res) => {
 };
 
 const updateAdmin = async (req, res) => {
-  const transaction = await sequelize.transaction();
+  // const transaction = await sequelize.transaction();
 
   try {
     const admin = await Admin.findOne({
@@ -29,10 +29,10 @@ const updateAdmin = async (req, res) => {
       (admin.password = req.body.password),
       await admin.save({ transaction });
 
-    await transaction.commit();
+    // await transaction.commit();
     res.status(200).json({ success: true, data: admin });
   } catch (error) {
-    await transaction.rollback();
+    // await transaction.rollback();
 
     res
       .status(500)
