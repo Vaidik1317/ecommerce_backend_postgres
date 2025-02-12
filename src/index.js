@@ -10,10 +10,10 @@ const router = express.Router();
 const http = require("http");
 const fileUpload = require("express-fileupload");
 const formidable = require("formidable");
-const { productsGalleryController } = require("./controllers/product_gallery");
+// const { productsGalleryController } = require("./controllers/product_gallery");
 
 const app = express();
-
+app.use(fileUpload());
 app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -23,17 +23,9 @@ app.use("./uploads", express.static(path.join(__dirname, "../uploads")));
 const PORT = process.env.PORT || 7000;
 
 // http.createServer(function (req, res) {
-//   if (req.url == "/uploads") {
+//   if (req.url == "/uploads" && req.method.toLowerCase() === "post") {
 //     var form = new formidable.IncomingForm();
-//     form.parse(req, function (err, fields, files) {
-//       var oldpath = files.filetoupload.filepath;
-//       var newpath = "C:/Users/Your Name/" + files.filetoupload.originalFilename;
-//       fs.rename(oldpath, newpath, function (err) {
-//         if (err) throw err;
-//         res.write("File uploaded and moved!");
-//         res.end();
-//       });
-//     });
+//     form.parse(req, function (err, fields, files) {});
 //   } else {
 //     res.writeHead(200, { "Content-Type": "text/html" });
 //     res.write(

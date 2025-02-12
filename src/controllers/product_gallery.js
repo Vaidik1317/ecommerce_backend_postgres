@@ -2,37 +2,88 @@ const { db } = require("../models");
 const { gallery: productsGalleryModel } = db;
 const path = require("path");
 const multer = require("multer");
-const express = require("express");
-const fileUpload = require("express-fileupload");
-const app = express();
-// const fileTypes = require("file-type");
+const fs = require("fs");
+const { error } = require("console");
+// const formidable = require("formidable");
 
-// default options
-// app.use(fileUpload());
+// const uploads = (req, file, res) => {
+//   try {
+//     console.log(req);
 
-// app.post("/upload", function (req, res) {
-//   if (!req.files || Object.keys(req.files).length === 0) {
-//     return res.status(400).send("No files were uploaded.");
+//     if (req.files && Object.keys(req.files).length !== 0) {
+//       const uploadedFile = req.files.uploadedFile;
+
+//       console.log(uploadedFile, " uploadedFile");
+
+//       const uploadPath = __dirname + "../uploads" + uploadedFile.products_url;
+//       console.log("🚀 ~ uploads ~ uploadPath:", uploadPath);
+
+//       if (!fs.existsSync(uploadPath)) {
+//         fs.mkdirSync(uploadPath, { recursive: true });
+//       }
+//       uploadedFile.mv(uploadPath, (err) => {
+//         // productsGalleryModel.create({
+//         //   products_url: req.fileUpload,
+//         // });
+
+//         if (err) {
+//           console.log(err);
+//           res.send("Failed !!");
+//         }
+//         // if (!err) {
+//         //   products_url.push(`../uploads/${req.uploadedFile}`);
+//         // }
+//         else {
+//           res.send("Successfully Uploaded !!");
+//         }
+//       });
+//     } else res.send("no file uploaded");
+//   } catch (error) {
+//     console.log("🚀 ~ uploads ~ error:", error);
 //   }
+// };
 
-//   // The name of the input field (i.e. "sampleFile") is used to retrieve the uploaded file
-//   let sampleFile = req.files.sampleFile;
+const uploads = async (req, res) => {
+  console.log("🚀 ~ uploads ~ uploads:", req.files);
 
-//   // Use the mv() method to place the file somewhere on your server
-//   sampleFile.mv("/somewhere/on/your/server/filename.jpg", function (err) {
-//     if (err) return res.status(500).send(err);
+  if (!req.files) {
+    res.status(400).json({ message: "bad request" });
+    return;
+  }
 
-//     res.send("File uploaded!");
-//   });
-// });
+  let images = req.files.products_url;
+  if (req.files.products_url > 20) {
+    images = `${req.files.uploads.products_url
+      .substring(0, 20)
+      .replace(".", "_")}_.${req.files.products_url.split(".")[1]}`;
+    console.log(images);
+  }
+  try {
+    fs.readFileSync("../uploads", (err, data) => {
+      if (err) throw new error(err);
+      if (data) {
+        fs.rename(
+          `../uploads/${data[0]}`,
+          `../uploads/${images}`,
+          (renameErr) => {
+            if (renameErr) throw new Error(renameErr);
+            if (!renameErr) {
+              return res
+                .status(200)
+                .json({ success: true, products_url: images });
+            } else {
+              return res.status(404).json({ success: false, products_url: "" });
+            }
+          }
+        );
+      }
+    });
+  } catch (error) {
+    console.log("🚀 ~ .replace ~ error:", error);
+  }
 
-// app.post("./uploads", fileUpload({ createParentPath: true }), (req, res) => {
-//   const files = req.files;
-//   console.log(files);
-
-//   return res.json({ success: "logged", message: "logged" });
-// });
-
+  // res.status(200).json({ message: "ok" });
+};
 // fetch
 const getGallery = async (req, res) => {
   try {
@@ -43,51 +94,30 @@ const getGallery = async (req, res) => {
     res.status(500).json({ success: false, message: "Not found" });
   }
 };
+
 // create
-const createGallery = async (req, res) => {
-  try {
-    const filePath = `../uploads/${req.file.filename}`;
-    await productsGalleryModel.create({
-      products_url: filePath,
-    });
-    console.log(filePath, "uploaded images");
-    // newGallery.save();
-    res.status(200).json({ success: true, data: storage });
-  } catch (error) {
-    console.log("newGallery - error", error);
-  }
-};
-
-// update
-// const updateGallery = async (req, res) => {
+// const createGallery = async (req, res) => {
 //   try {
-//   } catch (error) {}
+//     fs.readdir("../uploads", (err, data) => {
+//       if (err) throw new Error(err);
+//       if (data) {
+//         fs.rename(`../uploads/${data[0]}`);
+//       }
+//     });
+//     let filename = path.join(__dirname, "../uploads");
+//     const filePath = `../uploads/${filename}`;
+//     await productsGalleryModel.create({
+//       products_url: req.uploads,
+//     });
+//     console.log(filePath);
+
+//     res.status(200).json({ success: true, data: filePath });
+//   } catch (error) {
+//     console.log("newGallery - error", error);
+//   }
 // };
-
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, path.join(__dirname, "../uploads"));
-  },
-  filename: (req, file, cb) => {
-    cb(null, path.extname(file.originalname));
-  },
-});
-const upload = multer({
-  storage: storage,
-  limits: { fileSize: "100000000" },
-  fileFilter: (req, file, cb) => {
-    const fileTypes = /jpeg|jpg|png|gif/;
-    const mimeType = fileTypes.test(file.mimetype);
-    const extname = fileTypes.test(path.extname(file.originalname));
-
-    if (mimeType && extname) {
-      return cb(null, true);
-    }
-    cb("something else");
-  },
-}).single("products_url");
 module.exports.productsGalleryController = {
   getGallery,
-  createGallery,
-  upload,
+  // createGallery,
+  uploads,
 };

@@ -4,8 +4,8 @@ module.exports = (app, router) => {
   router.get("/getGallery", productsGalleryController.getGallery);
   router.post(
     "/createGallery",
-    productsGalleryController.upload,
-    productsGalleryController.createGallery
+    productsGalleryController.uploads
+    // productsGalleryController.createGallery
   );
 
   app.use("/api", router);
