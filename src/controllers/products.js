@@ -1,6 +1,18 @@
 // const Products = require("../models/products");
 const { db } = require("../models");
-const { product: products } = db;
+const { product: products, gallery: productsGalleryModel } = db;
+const fs = require("fs");
+
+const generateNumber = (length) => {
+  let result = "";
+  const characters = "0123456789";
+  const charactersLength = characters.length;
+  for (let i = 0; i < length; i++) {
+    result += characters.charAt(Math.floor(Math.random() * charactersLength));
+  }
+
+  return result;
+};
 
 // get products
 const getProducts = async (req, res) => {
@@ -28,6 +40,40 @@ const createProducts = async (req, res) => {
       }
       // { transaction }
     );
+
+    for (let i = 0; i < req.files.products_url.length; i++) {
+      const generateName = generateNumber(10);
+      let imageName;
+      if (req.files.products_url[i].mimetype === "application/pdf") {
+        imageName = `PRO-IMG-` + generateName + ".pdf";
+      } else {
+        imageName = "PRO-IMG" + generateName + ".png";
+      }
+
+      if (!fs.existsSync("public/upload")) {
+        fs.mkdirSync("public/upload", { recursive: true });
+      }
+
+      // for()
+      await new Promise(function (resolve, reject) {
+        req.files.products_url[i].mv(
+          `public/upload/` + imageName,
+
+          async function (err) {
+            if (err) {
+              reject(err);
+            } else {
+              resolve(null);
+            }
+          }
+        );
+      });
+
+      await productsGalleryModel.create({
+        products_url: `public/upload/` + imageName,
+        products_u_id: newProducts.u_id,
+      });
+    }
 
     // await transaction.commit();
     res.status(200).json({ success: true, data: newProducts });
