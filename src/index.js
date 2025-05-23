@@ -24,7 +24,10 @@ const specs = swaggerJsDoc({
       version: "1.0.0",
       description: "for admin panel",
     },
-    servers: [{ url: "http://localhost:7000" }],
+    servers: [
+      { url: "https://ecommerce-backend-postgres.onrender.com" },
+      { url: "http://localhost:7000" },
+    ],
     components: {
       securitySchemes: {
         bearerAuth: {
