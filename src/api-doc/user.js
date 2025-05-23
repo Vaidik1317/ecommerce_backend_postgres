@@ -6,7 +6,8 @@
  *       type: object
  *       properties:
  *         u_id:
- *           type: uuid
+ *           type: string
+ *           format: uuid
  *           description: Unique identifier for the user.
  *         name:
  *           type: string
@@ -16,41 +17,39 @@
  *           description: Mobile number of the user.
  *         email:
  *           type: string
- *           description: Email of the users.
+ *           description: Email of the user.
  *         password:
  *           type: string
  *           description: Hashed password of the user.
  *         address:
- *            type: string
- *            description: Address of user
+ *           type: string
+ *           description: Address of the user.
  *         city:
- *            type: string
- *            description: city name of user's address
+ *           type: string
+ *           description: City name of user's address.
  *         state:
- *             type: string
- *             description: state name of user's address
+ *           type: string
+ *           description: State name of user's address.
  *         country:
- *              type: string
- *              description: country of user's address
+ *           type: string
+ *           description: Country of user's address.
  *         pincode:
- *              type: string
- *              description: pincode of user's address
+ *           type: string
+ *           description: Pincode of user's address.
  *         gender:
- *              type: enum
- *              description: please select your
- *
- *
+ *           type: string
+ *           enum: [male, female, other]
+ *           description: Gender of the user.
  *       example:
- *         u_id: users12345
  *         name: John Doe
  *         mobile: "1234567890"
  *         email: johndoe@example.com
- *         password: "$2b$10$hashedPasswordExample"
- *         address: somewhere in Anand
- *         city: anand
- *         state: gujarat
- *         country: india
- *         picode: 380001
+ *         password: "test4212"
+ *         address: 123 Example Lane
+ *         city: Anand
+ *         state: Gujarat
+ *         country: India
+ *         pincode: "380001"
  *         gender: male
  */
 
@@ -96,32 +95,12 @@
  *       content:
  *         application/json:
  *           schema:
- *             type: object
- *             required: [name, email, password]
- *             properties:
- *               name:
- *                 type: string
- *               email:
- *                 type: string
- *               password:
- *                 type: string
- *               address:
- *                 type: string
- *               city:
- *                 type: string
- *               state:
- *                 type: string
- *               country:
- *                 type: string
- *               pincode:
- *                 type: string
- *               gender:
- *                 type: string
+ *             $ref: '#/components/schemas/User'
  *     responses:
  *       201:
  *         description: User created successfully
  *       500:
- *         description: Failed to create new user
+ *         description: Failed to create user
  */
 
 /**
