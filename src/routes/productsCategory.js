@@ -12,11 +12,11 @@ module.exports = (app, router) => {
     productCategoryController.createProductsCategory
   );
   router.put(
-    "/updateProductsCategory",
+    "/updateProductsCategory/:u_id",
     productCategoryController.updateProductsCategory
   );
   router.delete(
-    "/deleteProductsCategory",
+    "/deleteProductsCategory/:u_id",
     productCategoryController.deleteProductsCategory
   );
 };

@@ -1,23 +1,19 @@
 const Sequelize = require("sequelize");
+require("dotenv").config(); // Load environment variables
 
-const proConfig = {
-  use_env_variable: "postgresql://postgres:system123@localhost:5432/ecommerce",
+// Determine which database to use based on NODE_ENV
+const dbURI =
+  process.env.NODE_ENV === "test"
+    ? process.env.TEST_DB_URI
+    : process.env.PG_DB_URI;
+console.log("🚀 ~ dbURI:", dbURI);
+
+const sequelize = new Sequelize(dbURI, {
   dialect: "postgres",
-  dialectOptions: {},
-  logging: false,
-};
+  logging: false, // Disable logging for cleaner test output
+});
 
-const dBConnection = new Sequelize(
-  "postgresql://postgres:system123@localhost:5432/ecommerce",
-  proConfig
-);
-
-// const sequelize = new Sequelize("ecommerce", "postgres", "system123", {
-//   host: "localhost",
-//   dialect: "postgres",
-// });
 module.exports = {
   Sequelize,
-  dBConnection,
+  sequelize,
 };
-// module.exports = sequelize;

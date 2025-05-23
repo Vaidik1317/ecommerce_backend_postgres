@@ -19,7 +19,7 @@ const createProductsCategory = async (req, res) => {
       name: req.body.name,
     });
 
-    res.status(200).json({ success: true, data: newCategory });
+    res.status(201).json({ success: true, data: newCategory });
   } catch (error) {
     console.log("error in createProductsCategory ", error);
 
@@ -31,20 +31,28 @@ const createProductsCategory = async (req, res) => {
 
 // update
 const updateProductsCategory = async (req, res) => {
+  console.log(
+    "🚀 ~ updateProductsCategory ~ updateProductsCategory:",
+    req.body
+  );
   try {
     const updateCategory = await productsCategory.findOne({
-      where: { category_id: req.params.category_id },
+      where: { u_id: req.params.u_id },
     });
 
     if (!updateCategory) {
+      console.log(
+        "🚀 ~ updateProductsCategory ~ updateCategory:",
+        updateCategory
+      );
       res.status(404).json({ success: false, message: "not found" });
     }
 
-    (updateCategory.name = req.body.name),
-      await updateCategory.save({ transaction });
+    (updateCategory.name = req.body.name), await updateCategory.save();
 
-    res.status(200).json({ success: true, data: product });
+    res.status(201).json({ success: true, updateCategory });
   } catch (error) {
+    console.log("🚀 ~ updateProductsCategory ~ error:", error);
     res
       .status(500)
       .json({ success: false, message: "Failed to update product" });
@@ -56,7 +64,7 @@ const deleteProductsCategory = async (req, res) => {
   // const transaction = await sequelize.transaction();
   try {
     const product = await productsCategory.findOne({
-      where: { category_id: req.params.category_id },
+      where: { u_id: req.params.u_id },
     });
 
     if (!product) {
@@ -64,13 +72,13 @@ const deleteProductsCategory = async (req, res) => {
     }
 
     await productsCategory.destroy({
-      where: { category_id: req.params.category_id },
-      transaction,
+      where: { u_id: req.params.u_id },
     });
 
     // await transaction.commit();
-    res.status(200).json({ success: true, data: product });
+    res.status(200).json({ success: true });
   } catch (error) {
+    console.log("🚀 ~ deleteProductsCategory ~ error:", error);
     // await transaction.rollback();
 
     res.status(500).json({ success: false, message: "Something went wrong" });

@@ -5,51 +5,66 @@ const cors = require("cors");
 const bodyParser = require("body-parser");
 const path = require("path");
 const fs = require("fs");
-const { dbSync } = require("./sync");
 const router = express.Router();
-const http = require("http");
+const { dbSync } = require("./sync/index");
 const fileUpload = require("express-fileupload");
-const formidable = require("formidable");
-// const { productsGalleryController } = require("./controllers/product_gallery");
+const excelJs = require("exceljs");
+
+const socket = require("socket.io");
+const swaggerUI = require("swagger-ui-express");
+const swaggerJsDoc = require("swagger-jsdoc");
 
 const app = express();
+
+const specs = swaggerJsDoc({
+  definition: {
+    openapi: "3.0.0",
+    info: {
+      title: "Ecommerce API",
+      version: "1.0.0",
+      description: "for admin panel",
+    },
+    servers: [{ url: "http://localhost:7000" }],
+    components: {
+      securitySchemes: {
+        bearerAuth: {
+          type: "http",
+          scheme: "bearer",
+          bearerFormat: "JWT",
+        },
+      },
+    },
+  },
+  apis: ["./src/api-doc/*.js"],
+});
+// app.use("/admin-api", swaggerUI.serve, swaggerUI.setup(specs));
+app.use("/api-doc", swaggerUI.serveFiles(specs), swaggerUI.setup(specs));
+
+const options = {
+  filename: "./streamed-workbook.xlsx",
+  useStyles: true,
+  useSharedStrings: true,
+};
+const workbook = new excelJs.stream.xlsx.WorkbookWriter(options);
+
 app.use(fileUpload());
 app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
-// static
 
 app.use("./uploads", express.static(path.join(__dirname, "../uploads")));
+
 const PORT = process.env.PORT || 7000;
 
-// http.createServer(function (req, res) {
-//   if (req.url == "/uploads" && req.method.toLowerCase() === "post") {
-//     var form = new formidable.IncomingForm();
-//     form.parse(req, function (err, fields, files) {});
-//   } else {
-//     res.writeHead(200, { "Content-Type": "text/html" });
-//     res.write(
-//       '<form action="fileupload" method="post" enctype="multipart/form-data">'
-//     );
-//     res.write('<input type="file" name="filetoupload"><br>');
-//     res.write('<input type="submit">');
-//     res.write("</form>");
-//     return res.end();
-//   }
-// });
-
-app.get("/", function (req, res) {
-  res.send("Welcome toFoodies choice");
+app.use(express.static("./view"));
+app.get("/", (req, res) => {
+  return res.sendFile(__dirname + "/view/index.html");
 });
-requireRoutes(path.join(__dirname, "./routes"));
 
-// app.post("./uploads", fileUpload({ createParentPath: true }), (req, res) => {
-//   const files = req.files;
-//   console.log(files);
+// requireRoutes(path.join(__dirname, "./routes"));
+requireRoutes(path.join(__dirname, "./routes/"));
 
-//   return res.json({ success: "logged", message: "logged" });
-// });
-app.listen(PORT, () => {
+const server = app.listen(PORT, () => {
   console.log(`http://localhost:${PORT}`);
 });
 
@@ -61,5 +76,14 @@ function requireRoutes(dir) {
     )
     .forEach((file) => require(path.join(dir, file))(app, router));
 }
+const io = socket(server, {
+  transports: ["polling"],
+  cors: { origin: "*" },
+});
 
-dbSync();
+io.on("connection", (socket) => {
+  console.log("home page");
+  socket.on("disconnect", () => {});
+});
+// dbSync();
+module.exports = { app, io };

@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <title>Socket.IO chat</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC"
+      crossorigin="anonymous"
+    />
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.2.1/axios.min.js"></script>
+  </head>
+  <body class="container">
+    <h1>Sync Table</h1>
+    <!-- <form class="form" id="Sync" method="GET"  enctype="multipart/form-data"> -->
+      
+      <button id="dbSyncBtn" type="button" class="btn btn-primary" >Sync Table</button>
+      
+
+
+      <!-- Toast Notifications -->
+      <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 11;">
+        <div id="dbSyncToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+          <div class="toast-header">
+            <!-- <img src="..." class="rounded me-2" alt="..."> -->
+            <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+          </div>
+          <div class="toast-body">
+            Database synced successfully!
+          </div>
+        </div>
+    <!-- </form> -->
+
+    <button onclick="Download()">Download Excel File</button>
+
+    <p>Total Synced Tables: <span id="tabledata">0</span></p>
+
+    <script src="/socket.io/socket.io.js"></script>
+<!-- <script src="/backend/public/install-sync.js" type="text/script">  </script> -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+  $(document).ready(function () {
+  $(document).on("click", "#dbSyncBtn", function (e) {
+
+
+    e.preventDefault();
+
+    // Show the modal and spinner
+    $("#dbBackup").modal("show");
+
+    $.ajax({
+      url: "/dbSync",
+      type: "GET",
+      success: function (result) {
+        // Hide the modal
+        $("#dbBackup").modal("hide");
+
+        // Use a small delay to ensure the hide operations are completed
+        setTimeout(function () {
+          window.location.reload();
+        }, 100);
+
+        return false;
+      },
+      error: function () {
+        // Hide the modal
+        $("#dbBackup").modal("hide");
+
+        // Use a small delay to ensure the hide operations are completed
+        setTimeout(function () {
+          alert("Database sync failed");
+          window.location.reload();
+        }, 100);
+      },
+    });
+  });
+});
+
+</script>
+    <script>
+      const socket = io();
+
+      socket.on("totaltable", function (tableData) {
+    $("#totaltable").text(tableData.tableData);
+  });
+  socket.on("tableData", function (tableData) {
+    $("#tabledata").text(tableData.count);
+  });
+
+  document.addEventListener('DOMContentLoaded', function () {
+    const dbSyncBtn = document.getElementById('dbSyncBtn');
+    const dbSyncToast = new bootstrap.Toast(document.getElementById('dbSyncToast'));
+    const dbSeederToast = new bootstrap.Toast(document.getElementById('dbSeederToast'));
+    const dropAllToast = new bootstrap.Toast(document.getElementById('dropAllToast'));
+
+    if (dbSyncBtn) {
+      // DB Sync Button Event
+      dbSyncBtn.addEventListener('click', function () {
+        console.log("DB Sync button clicked");
+        setTimeout(function () {
+          dbSyncToast.show(); // Show the toast when DB sync is successful
+        }, 100); // Simulate a short delay for DB sync process
+      });
+    } else {
+      console.error('DB Sync button not found!');
+    }
+  });
+
+    </script>
+
+
+<!-- script for excel file download -->
+<script>
+
+  document.addEventListener('DOMContentLoaded', async ()=> {
+    function Download() {
+  axios.get('http://localhost:7000/api/exportUser').then(function (response) {
+      console.log(response)
+  })
+}
+
+  })
+</script>
+  </body>
+</html>
