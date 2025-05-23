@@ -11,6 +11,12 @@ console.log("🚀 ~ dbURI:", dbURI);
 const sequelize = new Sequelize(dbURI, {
   dialect: "postgres",
   logging: false, // Disable logging for cleaner test output
+  dialectOptions: {
+    ssl: {
+      require: true,
+      rejectUnauthorized: false, // Use false for development; for production, manage certs properly
+    },
+  },
 });
 
 module.exports = {
