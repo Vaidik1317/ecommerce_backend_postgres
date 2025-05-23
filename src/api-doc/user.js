@@ -61,331 +61,189 @@
  *   description: users management API
  */
 /**
+/**
  * @swagger
  * /api/getUsers:
  *   get:
- *     summary: List all users
- *     tags: [User]
- *     security:
- *       - bearerAuth: []
- *     parameters:
- *       - in: query
- *         name:
- *           schema:
- *             type: string
- *             description: name of users
- *         mobile:
- *           schema: 
- *             type: string
- *             description: Mobile number of the user.
- *         email:
- *           schema:
- *             type: string
- *             description: Email of the users.
- *         password:
- *           schema:
- *             type: string
- *             description: Hashed password of the user.
- *         address:
- *            schema:
- *              type: string
- *              description: Address of user
- *         city:
- *            schema:
- *              type: string
- *              description: city name of user's address
- *         state:
- *             schema:
- *               type: string
- *               description: state name of user's address
- *         country:
- *               schema:
- *                  type: string
- *                  description: country of user's address
- *         pincode:
- *              schema:
- *                type: string
- *                description: pincode of user's address
- *         gender:
- *              schema:
- *                type: enum
- *                description: please select your
- *
-          
+ *     summary: Get all users
+ *     tags: [Users]
  *     responses:
  *       200:
- *         description: Users retrieved successfully.
+ *         description: List of users retrieved successfully
  *         content:
  *           application/json:
  *             schema:
- *               type: array
- *               items:
- *                 $ref: '#/components/schemas/Admin'
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     type: object
  *       500:
- *         description: Something went wrong.
+ *         description: Not found
  */
 
 /**
  * @swagger
  * /api/createUsers:
  *   post:
- *     summary: create a user
- *     tags: [User]
- *     security:
- *       - bearerAuth: []
- *     parameters:
- *       - in: query
- *         name:
+ *     summary: Create a new user
+ *     tags: [Users]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
  *           schema:
- *             type: string
- *             description: name of users
- *         mobile:
- *           schema:
- *             type: string
- *             description: Mobile number of the user.
- *         email:
- *           schema:
- *             type: string
- *             description: Email of the users.
- *         password:
- *           schema:
- *             type: string
- *             description: Hashed password of the user.
- *         address:
- *            schema:
- *              type: string
- *              description: Address of user
- *         city:
- *            schema:
- *              type: string
- *              description: city name of user's address
- *         state:
- *             schema:
- *               type: string
- *               description: state name of user's address
- *         country:
- *               schema:
- *                  type: string
- *                  description: country of user's address
- *         pincode:
- *              schema:
- *                type: string
- *                description: pincode of user's address
- *         gender:
- *              schema:
- *                type: enum
- *                description: please select your
- *
+ *             type: object
+ *             required: [name, email, password]
+ *             properties:
+ *               name:
+ *                 type: string
+ *               email:
+ *                 type: string
+ *               password:
+ *                 type: string
+ *               address:
+ *                 type: string
+ *               city:
+ *                 type: string
+ *               state:
+ *                 type: string
+ *               country:
+ *                 type: string
+ *               pincode:
+ *                 type: string
+ *               gender:
+ *                 type: string
  *     responses:
- *      201:
- *        description: user created successfully.
- *        content:
- *          application/json:
- *            schema:
- *              $ref: '#/components/schemas/Admin'
- *      400:
- *        description:  user already exists.
- *      404:
- *        description: user not found.
- *      500:
- *        description: Something went wrong.
- *
- *
+ *       201:
+ *         description: User created successfully
+ *       500:
+ *         description: Failed to create new user
  */
 
 /**
  * @swagger
- * /api/updateUsers:
+ * /api/updateUsers/{u_id}:
  *   put:
- *     summary: update a user
- *     tags: [User]
- *     security:
- *       - bearerAuth: []
+ *     summary: Update an existing user
+ *     tags: [Users]
  *     parameters:
- *       - in: query
- *         name:
+ *       - in: path
+ *         name: u_id
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: User ID
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
  *           schema:
- *             type: string
- *             description: name of users
- *         mobile:
- *           schema:
- *             type: string
- *             description: Mobile number of the user.
- *         email:
- *           schema:
- *             type: string
- *             description: Email of the users.
- *         password:
- *           schema:
- *             type: string
- *             description: Hashed password of the user.
- *         address:
- *            schema:
- *              type: string
- *              description: Address of user
- *         city:
- *            schema:
- *              type: string
- *              description: city name of user's address
- *         state:
- *             schema:
- *               type: string
- *               description: state name of user's address
- *         country:
- *               schema:
- *                  type: string
- *                  description: country of user's address
- *         pincode:
- *              schema:
- *                type: string
- *                description: pincode of user's address
- *         gender:
- *              schema:
- *                type: enum
- *                description: please select your
- *
+ *             type: object
+ *             properties:
+ *               name:
+ *                 type: string
+ *               email:
+ *                 type: string
+ *               address:
+ *                 type: string
+ *               city:
+ *                 type: string
+ *               state:
+ *                 type: string
+ *               country:
+ *                 type: string
+ *               pincode:
+ *                 type: string
+ *               gender:
+ *                 type: string
  *     responses:
- *      201:
- *        description: Admin created successfully.
- *        content:
- *          application/json:
- *            schema:
- *              $ref: '#/components/schemas/Admin'
- *      400:
- *        description:  user already exists.
- *      404:
- *        description: user not found.
- *      500:
- *        description: Something went wrong.
- *
- *
+ *       201:
+ *         description: User updated successfully
+ *       500:
+ *         description: Failed to update user
  */
 
 /**
  * @swagger
- * /api/deleteUsers:
+ * /api/deleteUsers/{u_id}:
  *   delete:
- *     summary: delete a user
- *     tags: [User]
- *     security:
- *       - bearerAuth: []
+ *     summary: Delete a user
+ *     tags: [Users]
  *     parameters:
- *       - in: query
- *         name:
- *           schema:
- *             type: string
- *             description: name of users
- *         mobile:
- *           schema:
- *             type: string
- *             description: Mobile number of the user.
- *         email:
- *           schema:
- *             type: string
- *             description: Email of the users.
- *         password:
- *           schema:
- *             type: string
- *             description: Hashed password of the user.
- *         address:
- *            schema:
- *              type: string
- *              description: Address of user
- *         city:
- *            schema:
- *              type: string
- *              description: city name of user's address
- *         state:
- *             schema:
- *               type: string
- *               description: state name of user's address
- *         country:
- *               schema:
- *                  type: string
- *                  description: country of user's address
- *         pincode:
- *              schema:
- *                type: string
- *                description: pincode of user's address
- *         gender:
- *              schema:
- *                type: enum
- *                description: please select your
- *
+ *       - in: path
+ *         name: u_id
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: User ID
  *     responses:
- *      201:
- *        description: Admin created successfully.
- *        content:
- *          application/json:
- *            schema:
- *              $ref: '#/components/schemas/Admin'
- *      400:
- *        description:  user already exists.
- *      404:
- *        description: user not found.
- *      500:
- *        description: Something went wrong.
- *
- *
+ *       201:
+ *         description: User deleted successfully
+ *       404:
+ *         description: User not found
+ *       500:
+ *         description: Something went wrong
  */
 
 /**
  * @swagger
  * /api/login:
  *   post:
- *     summary: create a user
- *     tags: [User]
- *     security:
- *       - bearerAuth: []
- *     parameters:
- *       - in: query
- *         email:
+ *     summary: Log in a user
+ *     tags: [Users]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
  *           schema:
- *             type: string
- *             description: Email of the users.
- *         password:
- *           schema:
- *             type: string
- *             description: Hashed password of the user.
- *
+ *             type: object
+ *             required:
+ *               - email
+ *               - password
+ *             properties:
+ *               email:
+ *                 type: string
+ *               password:
+ *                 type: string
  *     responses:
- *      201:
- *        description: user created successfully.
- *        content:
- *          application/json:
- *            schema:
- *              $ref: '#/components/schemas/Admin'
- *      400:
- *        description:  user already exists.
- *      404:
- *        description: user not found.
- *      500:
- *        description: Something went wrong.
- *
- *
+ *       201:
+ *         description: Login successful
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Login successful
+ *                 token:
+ *                   type: string
+ *       404:
+ *         description: Invalid email or password
+ *       500:
+ *         description: Error logging in
  */
 
 /**
  * @swagger
  * /api/exportUser:
  *   get:
- *     summary: Download Excel file of all register user
- *     tags: [User]
- *     security:
- *        - bearerAuth: []
- *     required: true
- *     content:
- *       application/json:
- *
+ *     summary: Export users to Excel
+ *     tags: [Users]
  *     responses:
  *       200:
- *         description: File Downloaded successfully.
+ *         description: Excel file download
  *         content:
- *           application/json:
+ *           application/vnd.openxmlformats-officedocument.spreadsheetml.sheet:
  *             schema:
- *               type: object
- *     500:
- *         description: Something went wrong.
+ *               type: string
+ *               format: binary
+ *       500:
+ *         description: Error in export user
  */
 
 // const invoicePdf = async (req, res) => {
