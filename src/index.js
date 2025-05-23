@@ -25,8 +25,8 @@ const specs = swaggerJsDoc({
       description: "for admin panel",
     },
     servers: [
-      { url: "https://ecommerce-backend-postgres.onrender.com" },
       { url: "http://localhost:7000" },
+      { url: "https://ecommerce-backend-postgres.onrender.com" },
     ],
     components: {
       securitySchemes: {
