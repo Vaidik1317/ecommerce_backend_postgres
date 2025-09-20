@@ -117,35 +117,57 @@ const deleteUsers = async (req, res) => {
 const login = async (req, res) => {
   console.log("🚀 ~ login ~ login:", login);
 
-  const data = ({ email, password } = req.body);
-
-  console.log("🚀 ~ login ~ data:", data);
+  const { email, password } = req.body;
 
   try {
-    const loginUser = await user.findOne({ where: { email: req.body.email } });
+    const loginUser = await user.findOne({ where: { email } });
 
-    console.log("🚀 ~ login ~ loginUser:", loginUser);
     if (!loginUser) {
-      console.log("🚀 ~ login ~ loginUser:", loginUser);
-      return res.status(404).json({ success: false, message: "not found" });
+      return res
+        .status(404)
+        .json({ success: false, message: "User not found" });
     }
 
     const isMatch = await bcrypt.compare(password, loginUser.password);
-    console.log("🚀 ~ login ~ isMatch:", isMatch);
 
     if (!isMatch) {
       return res
-        .status(404)
-        .json({ success: false, message: "invalid password" });
+        .status(401)
+        .json({ success: false, message: "Invalid password" });
     }
 
-    const token = jwt.sign({ userId: loginUser.u_id }, "012efgh", {
-      expiresIn: "7h",
+    // Create JWT token with user ID and maybe email or name if needed
+    const token = jwt.sign(
+      { userId: loginUser.u_id, email: loginUser.email },
+      "012efgh",
+      {
+        expiresIn: "7h",
+      }
+    );
+
+    // Prepare user data to send back (omit sensitive info like password)
+    const userData = {
+      u_id: loginUser.u_id,
+      name: loginUser.name,
+      email: loginUser.email,
+      address: loginUser.address,
+      city: loginUser.city,
+      state: loginUser.state,
+      country: loginUser.country,
+      pincode: loginUser.pincode,
+      gender: loginUser.gender,
+      // add other user fields you want frontend to have
+    };
+
+    res.status(200).json({
+      success: true,
+      message: "Login successful",
+      user: userData,
+      token,
     });
-    console.log("🚀 ~ login ~ token:", token);
-    res.status(201).json({ message: "Login successful", token });
   } catch (error) {
-    res.status(500).json({ error: "Error logging in" });
+    console.error("🚀 ~ login ~ error:", error);
+    res.status(500).json({ success: false, message: "Error logging in" });
   }
 };
 

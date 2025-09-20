@@ -67,7 +67,7 @@ const uploads = async (req, res) => {
 
       await productsGalleryModel.create({
         products_url: `public/upload/` + imageName,
-        // products_u_id: req.body.products_u_id,
+        products_u_id: req.body.products_u_id,
       });
     }
 

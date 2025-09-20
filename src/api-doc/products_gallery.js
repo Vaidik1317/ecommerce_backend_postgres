@@ -2,142 +2,91 @@
  * @swagger
  * components:
  *   schemas:
- *     Products Gallery:
- *        type: object
- *        properties:
- *          u_id:
- *             type: string
- *             description: Unique id for the product category
- *          images,video:
- *             type: string
- *             description: name of product category
- *        example:
- *          u_id: CATEGORY1234
- *          name: Smart Phone
+ *     ProductsGallery:
+ *       type: object
+ *       properties:
+ *         id:
+ *           type: string
+ *           description: Unique identifier for the gallery item
+ *         products_url:
+ *           type: string
+ *           description: Path to uploaded image or PDF
+ *         products_u_id:
+ *           type: string
+ *           description: ID of the product this image belongs to
+ *       example:
+ *         id: 1
+ *         products_url: public/upload/PRO-IMG-1234567890.png
+ *         products_u_id: PROD123456
  */
+
 /**
  * @swagger
  * tags:
  *   name: Gallery
- *   description: Gallery management API
+ *   description: Upload and retrieve product gallery items
  */
 
 /**
  * @swagger
  * /api/createGallery:
  *   post:
- *     summery: Add a new category
+ *     summary: Upload product gallery files and associate them with a product
  *     tags: [Gallery]
- *     security:
- *       - bearerAuth: []
- *     required: true
- *     content:
- *       application/json:
- *         schema:
- *          type: object
- *          properties:
- *            products_url:
- *              type: string
- *              description: images and videos for products
-
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         multipart/form-data:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               products_u_id:
+ *                 type: string
+ *                 description: Product ID the file belongs to
+ *                 example: PROD123456
+ *               products_url:
+ *                 type: array
+ *                 items:
+ *                   type: string
+ *                   format: binary
  *     responses:
- *      201:
- *        description: gallery created successfully.
- *        content:
- *          application/json:
- *            schema:
- *              $ref: '#/components/schemas/Admin'
- *      500:
- *        description: Something went wrong.
- *
- *
+ *       201:
+ *         description: Files uploaded and linked to the product successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: success
+ *       400:
+ *         description: No file uploaded or missing product ID
+ *       500:
+ *         description: Internal server error
  */
 
 /**
  * @swagger
  * /api/getGallery:
  *   get:
- *     summery: List all product's galleries
+ *     summary: Retrieve all uploaded product gallery items
  *     tags: [Gallery]
- *     security:
- *       - bearerAuth: []
- *     required: true
- *     content:
- *       application/json:
- *         schema:
- *          type: object
- *          properties:
- *            products_url:
- *              type: string
- *              description: name of gallery
- *
  *     responses:
- *      201:
- *        description: gallery created successfully.
- *        content:
- *          application/json:
- *            schema:
- *              $ref: '#/components/schemas/Admin'
- *      500:
- *        description: Something went wrong.
- *
- *
- */
-
-/**
- * @swagger
- * /api/Gallery:
- *   put:
- *     summery: update a category
- *     tags: [Gallery]
- *     security:
- *       - bearerAuth: []
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *            type: object
- *            properties:
- *              name:
- *                type: string
- *                description: name of gallery
-
- *     responses:
- *      201:
- *        description: gallery update successfully.
- *        content:
- *          application/json:
- *            schema:
- *              $ref: '#/components/schemas/Admin'
- *      500:
- *        description: Something went wrong.
- *
- *
- */
-
-/**
- * @swagger
- * /api/Gallery:
- *   delete:
- *     summery: delete category
- *     tags: [Gallery]
- *     security:
- *       - bearerAuth: []
- *     required: true
- *     content:
- *       application/json:
-
- *     responses:
- *      201:
- *        description: gallery delete successfully.
- *        content:
- *          application/json:
- *            schema:
- *              $ref: '#/components/schemas/Admin'
-
- *      500:
- *        description: Something went wrong.
- *
- *
+ *       201:
+ *         description: Successfully retrieved gallery
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/ProductsGallery'
+ *       500:
+ *         description: Server error while fetching gallery
  */

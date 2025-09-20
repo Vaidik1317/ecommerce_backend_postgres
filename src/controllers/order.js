@@ -16,7 +16,23 @@ const fs = require("fs");
 // orderItem
 const getOrders = async (req, res) => {
   try {
-    const getOrder = await order.findAll({});
+    const getOrder = await order.findAll({
+      include: [
+        {
+          model: db.items, // orderItemsModel
+          include: [
+            {
+              model: db.product, // include product details too
+            },
+          ],
+        },
+        {
+          model: db.user,
+          attributes: ["u_id", "email", "name"], // optional: only return what you need
+        },
+      ],
+    });
+
     res.status(200).json({ success: true, data: getOrder });
   } catch (error) {
     console.log("Error in fetching all orders", error.message);
