@@ -20,6 +20,7 @@ Object.keys(db).forEach((modelName) => {
     db[modelName].associate(db);
   }
 });
+
 async function resetDatabase() {
   if (process.env.NODE_ENV === "test") {
     console.log("Dropping and recreating the test database...");

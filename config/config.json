@@ -1,0 +1,26 @@
+{
+  "development": {
+    "username": null,
+    "password": null,
+    "database": null,
+    "host": "127.0.0.1",
+    "dialect": "postgres",
+    "use_env_variable": "PG_DB_URI"
+  },
+  "test": {
+    "username": null,
+    "password": null,
+    "database": null,
+    "host": "127.0.0.1",
+    "dialect": "postgres",
+    "use_env_variable": "TEST_DB_URI"
+  },
+  "production": {
+    "username": null,
+    "password": null,
+    "database": null,
+    "host": "127.0.0.1",
+    "dialect": "postgres",
+    "use_env_variable": "PG_DB_URI"
+  }
+}

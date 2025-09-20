@@ -88,5 +88,5 @@ io.on("connection", (socket) => {
   console.log("home page");
   socket.on("disconnect", () => {});
 });
-// dbSync();
+// dbSync(); // Removed sync call - use migrations instead
 module.exports = { app, io };

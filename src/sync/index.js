@@ -3,83 +3,79 @@ const { db } = require("../models");
 const cron = require("node-cron");
 
 const sequelize = db.sequelize;
-const dbSync = async () => {
+const dbMigrate = async () => {
   try {
     const { io } = require("../index");
 
-    const syncResults = [];
-    console.log("🚀 ~ dbSync ~ syncResults:", syncResults);
+    const migrateResults = [];
+    console.log("🚀 ~ dbMigrate ~ migrateResults:", migrateResults);
     let successCount = 0;
 
     const models = Object.keys(db.sequelize.models);
-    console.log("🚀 ~ dbSync ~ models:", models);
+    console.log("🚀 ~ dbMigrate ~ models:", models);
 
     io.emit("totaltable", { tableData: models.length });
 
-    await db.sequelize.sync({ force: false, alter: true });
+    // Run migrations instead of sync
+    const path = require('path');
+    const { Sequelize } = require('sequelize');
+    const Umzug = require('umzug');
 
-    const countTables = async () => {
-      console.log("🚀 ~ countTables ~ countTables:", countTables);
-      const [results] = await db.sequelize.query(`
-          SELECT count(*)
-          FROM information_schema.tables
-          WHERE table_schema = 'public'
-        `);
+    const umzug = new Umzug({
+      migrations: {
+        path: path.join(__dirname, '../migrations'),
+        pattern: /^\d+[\w-]+\.js$/
+      },
+      storage: 'sequelize',
+      storageOptions: {
+        sequelize: sequelize,
+      },
+    });
 
-      return parseInt(results[0].count, 10);
-    };
+    // Get pending migrations
+    const pendingMigrations = await umzug.pending();
+    console.log("🚀 ~ dbMigrate ~ pendingMigrations:", pendingMigrations);
 
-    const existingTableCount = await countTables();
+    if (pendingMigrations.length > 0) {
+      // Run migrations
+      const migrationResults = await umzug.up();
 
-    if (existingTableCount === 0) {
-      await db.sequelize.sync({ force: false, alter: true });
-    }
-
-    for (const modelName of models) {
-      try {
-        const model = db.sequelize.models[modelName];
-        await model.sync({ force: false, alter: true });
-        syncResults.push({ model: modelName, status: "success" });
+      migrationResults.forEach((result) => {
+        migrateResults.push({ migration: result.file, status: "success" });
         successCount++;
-
         io.emit("tableData", { count: successCount });
-      } catch (modelError) {
-        syncResults.push({
-          model: modelName,
-          status: "failed",
-          error: modelError.message,
-        });
-        console.log(`🚀 ~ Error syncing model ${modelName}:`, modelError);
-        io.emit("modelName", { module_name: modelName });
+      });
 
-        return modelName;
-      }
-      console.log("🚀 ~ dbSync ~ successCount:", successCount);
+      console.log("🚀 ~ dbMigrate ~ migrationResults:", migrationResults);
+    } else {
+      console.log("🚀 ~ dbMigrate ~ No pending migrations");
+      migrateResults.push({ status: "no_migrations", message: "No pending migrations" });
     }
 
-    const failedSyncs = syncResults.filter(
+    const failedMigrations = migrateResults.filter(
       (result) => result.status === "failed"
     );
 
-    if (failedSyncs.length > 0) {
+    if (failedMigrations.length > 0) {
       res
         .status(422)
-        .send({ message: "Some models failed to sync", results: syncResults });
+        .send({ message: "Some migrations failed", results: migrateResults });
     } else {
-      res.status(201).send("Successfully synced all models");
+      res.status(201).send("Successfully ran all migrations");
     }
   } catch (error) {
-    console.log("🚀 ~ dbSync ~ error:", error);
+    console.log("🚀 ~ dbMigrate ~ error:", error);
+    res.status(500).send({ message: "Migration failed", error: error.message });
   }
 };
 
-// cron.schedule("*/1****", dbSync);
+// cron.schedule("*/1****", dbMigrate);
 // cron.schedule("*/50 * * * * *", () => {
-//   dbSync();
-//   console.log("running a  sync task every 20 sec minutes");
-//   console.log("🚀 ~ cron.schedule ~ dbSync:", dbSync);
+//   dbMigrate();
+//   console.log("running a migration task every 20 sec minutes");
+//   console.log("🚀 ~ cron.schedule ~ dbMigrate:", dbMigrate);
 // });
 
-// console.log("🚀 ~ cron:sync", cron);
+// console.log("🚀 ~ cron:migrate", cron);
 
-module.exports.dbSyncController = { dbSync };
+module.exports.dbSyncController = { dbSync: dbMigrate };

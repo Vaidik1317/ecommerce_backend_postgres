@@ -6,7 +6,11 @@
   "scripts": {
     "start": "cross-env NODE_ENV=development node src/index.js",
     "dev": "nodemon src/index.js",
-    "test": "cross-env NODE_ENV=test jest"
+    "test": "cross-env NODE_ENV=test jest",
+    "db:migrate": "sequelize-cli db:migrate",
+    "db:migrate:undo": "sequelize-cli db:migrate:undo",
+    "db:migrate:undo:all": "sequelize-cli db:migrate:undo:all",
+    "db:create": "sequelize-cli db:create"
   },
   "keywords": [],
   "author": "",
@@ -41,10 +45,12 @@
     "socket.io": "^4.8.1",
     "supertest": "^7.0.0",
     "swagger-jsdoc": "^6.2.8",
-    "swagger-ui-express": "^5.0.1"
+    "swagger-ui-express": "^5.0.1",
+    "umzug": "^3.8.2"
   },
   "devDependencies": {
     "cross-env": "^7.0.3",
-    "jest": "^29.7.0"
+    "jest": "^29.7.0",
+    "sequelize-cli": "^6.6.3"
   }
 }
