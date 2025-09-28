@@ -56,10 +56,9 @@
 /**
  * @swagger
  * tags:
- *   name: User
+ *   name: Users
  *   description: users management API
  */
-/**
 /**
  * @swagger
  * /api/getUsers:

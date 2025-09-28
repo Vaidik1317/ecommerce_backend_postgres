@@ -16,6 +16,7 @@ const sequelize = new Sequelize(dbURI, {
       require: true,
       rejectUnauthorized: false, // Use false for development; for production, manage certs properly
     },
+    family: 4, // Force IPv4 to avoid IPv6 connection issues
   },
 });
 

@@ -2,7 +2,7 @@
  * @swagger
  * components:
  *   schemas:
- *     Products categories:
+ *     ProductCategory:
  *        type: object
  *        properties:
  *          u_id:
@@ -25,7 +25,7 @@
  * @swagger
  * /api/createProductsCategory:
  *   post:
- *     summery: Add a new category
+ *     summary: Add a new category
  *     tags: [Category]
  *     security:
  *       - bearerAuth: []
@@ -61,7 +61,7 @@
  * @swagger
  * /api/getProductsCategory:
  *   get:
- *     summery: List all product's categories
+ *     summary: List all product's categories
  *     tags: [Category]
  *     security:
  *       - bearerAuth: []
@@ -132,7 +132,7 @@
  * @swagger
  * /api/deleteProductsCategory:
  *   delete:
- *     summery: delete category
+ *     summary: delete category
  *     tags: [Category]
  *     security:
  *       - bearerAuth: []

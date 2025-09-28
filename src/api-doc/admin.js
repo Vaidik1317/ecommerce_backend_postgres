@@ -42,7 +42,7 @@
  * @swagger
  * /api/admin:
  *   post:
- *     summery: Add a admin
+ *     summary: Add a admin
  *     tags: [Admin]
  *     security:
  *       - bearerAuth: []
