@@ -5,6 +5,7 @@ module.exports = (sequelize, Sequelize) => {
       u_id: {
         type: Sequelize.UUID,
         defaultValue: Sequelize.UUIDV4,
+        primaryKey: true,
         allowNull: false,
         unique: true,
       },
@@ -30,6 +31,7 @@ module.exports = (sequelize, Sequelize) => {
       },
     },
     {
+      id: false,
       createdAt: "created_at",
       updatedAt: "updated_at",
       timestamps: true,

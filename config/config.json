@@ -21,6 +21,12 @@
     "database": null,
     "host": "127.0.0.1",
     "dialect": "postgres",
-    "use_env_variable": "PG_DB_URI"
+    "use_env_variable": "PG_DB_URI",
+    "dialectOptions": {
+      "ssl": {
+        "require": true,
+        "rejectUnauthorized": false
+      }
+    }
   }
 }

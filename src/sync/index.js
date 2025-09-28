@@ -3,7 +3,7 @@ const { db } = require("../models");
 const cron = require("node-cron");
 
 const sequelize = db.sequelize;
-const dbMigrate = async () => {
+const dbMigrate = async (req, res) => {
   try {
     const { io } = require("../index");
 
@@ -19,17 +19,14 @@ const dbMigrate = async () => {
     // Run migrations instead of sync
     const path = require('path');
     const { Sequelize } = require('sequelize');
-    const Umzug = require('umzug');
+    const { Umzug, SequelizeStorage } = require('umzug');
 
     const umzug = new Umzug({
       migrations: {
-        path: path.join(__dirname, '../migrations'),
-        pattern: /^\d+[\w-]+\.js$/
+        glob: path.join(__dirname, '../migrations', '*.js'),
       },
-      storage: 'sequelize',
-      storageOptions: {
-        sequelize: sequelize,
-      },
+      storage: new SequelizeStorage({ sequelize }),
+      context: sequelize.getQueryInterface(),
     });
 
     // Get pending migrations

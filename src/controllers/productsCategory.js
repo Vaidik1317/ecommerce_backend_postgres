@@ -5,6 +5,7 @@ const { category: productsCategory } = db;
 const getProductsCategory = async (req, res) => {
   try {
     const getCategory = await productsCategory.findAll({});
+    console.log("🚀 ~ getProductsCategory ~ getCategory:", getCategory)
     res.status(200).json({ success: true, data: getCategory });
   } catch (error) {
     console.log("Error in fetching products category:", error.message);

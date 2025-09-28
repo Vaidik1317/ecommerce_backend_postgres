@@ -1,4 +1,4 @@
-const sequelize = require("./db-connection");
+const { sequelize } = require("./db-connection");
 // const app = require("express");
 const express = require("express");
 const cors = require("cors");
@@ -67,8 +67,14 @@ app.get("/", (req, res) => {
 // requireRoutes(path.join(__dirname, "./routes"));
 requireRoutes(path.join(__dirname, "./routes/"));
 
-const server = app.listen(PORT, () => {
+const server = app.listen(PORT, async () => {
   console.log(`http://localhost:${PORT}`);
+  try {
+    await sequelize.authenticate();
+    console.log('Database connection has been established successfully.');
+  } catch (error) {
+    console.error('Unable to connect to the database:', error);
+  }
 });
 
 function requireRoutes(dir) {
