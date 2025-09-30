@@ -40,9 +40,9 @@
  */
 /**
  * @swagger
- * /api/admin:
+ * /api/createAdmin:
  *   post:
- *     summary: Add a admin
+ *     summary: Create a new admin
  *     tags: [Admin]
  *     security:
  *       - bearerAuth: []
@@ -51,31 +51,19 @@
  *       content:
  *         application/json:
  *           schema:
- *             type: object
- *             properties:
- *               name:
- *                 type: string
- *                 description: name of admin
- *               mobile:
- *                 type: string
- *                 description: Mobile number of the admin.
- *               email:
- *                 type: string
- *                 description: Email of the admin.
- *               password:
- *                 type: string
- *                 description: Password for the admin.
+ *             $ref: '#/components/schemas/Admin'
  *     responses:
  *      201:
  *        description: Admin created successfully.
  *        content:
  *          application/json:
  *            schema:
- *              $ref: '#/components/schemas/Admin'
- *      400:
- *        description:  Email already exists.
- *      404:
- *        description: Admin not found.
+ *              type: object
+ *              properties:
+ *                success:
+ *                  type: boolean
+ *                data:
+ *                  $ref: '#/components/schemas/Admin'
  *      500:
  *        description: Something went wrong.
  */
@@ -84,35 +72,63 @@
  * @swagger
  * /api/getAdmin:
  *   get:
- *     summary: List all admins
+ *     summary: Get all admins
  *     tags: [Admin]
  *     security:
  *       - bearerAuth: []
- *     parameters:
- *       - in: query
- *         name: page
- *         schema:
- *           type: integer
- *         description: The page number to retrieve.
- *       - in: query
- *         name: items_per_page
- *         schema:
- *           type: integer
- *         description: The number of items per page.
- *       - in: query
- *         name: search
- *         schema:
- *           type: string
- *         description: The search .
  *     responses:
  *       200:
  *         description: Admins retrieved successfully.
  *         content:
  *           application/json:
  *             schema:
- *               type: array
- *               items:
- *                 $ref: '#/components/schemas/Admin'
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/Admin'
  *       500:
- *         description: Something went wrong.
+ *         description: Not found.
+ */
+
+/**
+ * @swagger
+ * /api/updateAdmin/{u_id}:
+ *   put:
+ *     summary: Update an existing admin
+ *     tags: [Admin]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: u_id
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: Admin ID
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/Admin'
+ *     responses:
+ *       201:
+ *         description: Admin updated successfully.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                 data:
+ *                   $ref: '#/components/schemas/Admin'
+ *       404:
+ *         description: Admin not found.
+ *       500:
+ *         description: Failed to update product.
  */

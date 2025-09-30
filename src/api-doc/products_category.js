@@ -39,20 +39,15 @@
  *              name:
  *                type: string
  *                description: name of category
-
  *     responses:
  *      201:
- *        description: category created successfully.
+ *        description: Category created successfully.
  *        content:
  *          application/json:
  *            schema:
- *              $ref: '#/components/schemas/Admin'
- *      400:
- *        description:  category already exists.
- *      404:
- *        description: category not found.
+ *              $ref: '#/components/schemas/ProductCategory'
  *      500:
- *        description: Something went wrong.
+ *        description: Failed to create new product.
  *
  *
  */
@@ -65,29 +60,17 @@
  *     tags: [Category]
  *     security:
  *       - bearerAuth: []
- *     required: true
- *     content:
- *       application/json:
- *         schema:
- *          type: object
- *          properties:
- *            name:
- *              type: string
- *              description: name of category
- *
  *     responses:
- *      201:
- *        description: Category created successfully.
+ *      200:
+ *        description: Categories retrieved successfully.
  *        content:
  *          application/json:
  *            schema:
- *              $ref: '#/components/schemas/Admin'
- *      400:
- *        description:  Category already exists.
- *      404:
- *        description: Category not found.
+ *              type: array
+ *              items:
+ *                $ref: '#/components/schemas/ProductCategory'
  *      500:
- *        description: Something went wrong.
+ *        description: Not found.
  *
  *
  */
@@ -106,7 +89,7 @@
  *         schema:
  *           type: string
  *         required: true
- *         description: Unique identifier for the blog.
+ *         description: Unique identifier for the category.
  *     requestBody:
  *       required: true
  *       content:
@@ -116,38 +99,39 @@
  *             properties:
  *               name:
  *                 type: string
-
  *     responses:
  *       200:
  *         description: Category updated successfully.
- *       400:
- *         description: Invalid input or the blog with this ID does not exist.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ProductCategory'
  *       404:
  *         description: Category not found.
  *       500:
- *         description: Something went wrong.
+ *         description: Failed to update product.
  */
 
 /**
  * @swagger
- * /api/deleteProductsCategory:
+ * /api/deleteProductsCategory/{u_id}:
  *   delete:
- *     summary: delete category
+ *     summary: Delete a category
  *     tags: [Category]
  *     security:
  *       - bearerAuth: []
- *     required: true
- *     content:
- *       application/json:
-
+ *     parameters:
+ *       - in: path
+ *         name: u_id
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: Unique identifier for the category.
  *     responses:
- *      201:
- *        description: category delete successfully.
- *        content:
- *          application/json:
- *            schema:
- *              $ref: '#/components/schemas/Admin'
-
+ *      200:
+ *        description: Category deleted successfully.
+ *      404:
+ *        description: Category not found.
  *      500:
  *        description: Something went wrong.
  *

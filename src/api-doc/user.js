@@ -7,14 +7,10 @@
  *       properties:
  *         u_id:
  *           type: string
- *           format: uuid
  *           description: Unique identifier for the user.
  *         name:
  *           type: string
  *           description: Name of the user.
- *         mobile:
- *           type: string
- *           description: Mobile number of the user.
  *         email:
  *           type: string
  *           description: Email of the user.
@@ -41,10 +37,10 @@
  *           enum: [male, female, other]
  *           description: Gender of the user.
  *       example:
+ *         u_id: USER1234
  *         name: John Doe
- *         mobile: "1234567890"
  *         email: johndoe@example.com
- *         password: "test4212"
+ *         password: "hashedpassword"
  *         address: 123 Example Lane
  *         city: Anand
  *         state: Gujarat
@@ -78,7 +74,7 @@
  *                 data:
  *                   type: array
  *                   items:
- *                     type: object
+ *                     $ref: '#/components/schemas/User'
  *       500:
  *         description: Not found
  */
@@ -98,6 +94,15 @@
  *     responses:
  *       201:
  *         description: User created successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                 data:
+ *                   $ref: '#/components/schemas/User'
  *       500:
  *         description: Failed to create user
  */
@@ -141,6 +146,17 @@
  *     responses:
  *       201:
  *         description: User updated successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     type: integer
  *       500:
  *         description: Failed to update user
  */
@@ -161,6 +177,13 @@
  *     responses:
  *       201:
  *         description: User deleted successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
  *       404:
  *         description: User not found
  *       500:
@@ -188,20 +211,25 @@
  *               password:
  *                 type: string
  *     responses:
- *       201:
+ *       200:
  *         description: Login successful
  *         content:
  *           application/json:
  *             schema:
  *               type: object
  *               properties:
+ *                 success:
+ *                   type: boolean
  *                 message:
  *                   type: string
- *                   example: Login successful
+ *                 user:
+ *                   $ref: '#/components/schemas/User'
  *                 token:
  *                   type: string
+ *       401:
+ *         description: Invalid password
  *       404:
- *         description: Invalid email or password
+ *         description: User not found
  *       500:
  *         description: Error logging in
  */

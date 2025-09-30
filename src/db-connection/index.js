@@ -6,7 +6,7 @@ const dbURI =
   process.env.NODE_ENV === "test"
     ? process.env.TEST_DB_URI
     : process.env.PG_DB_URI;
-console.log("🚀 ~ dbURI:", dbURI);
+// console.log("🚀 ~ dbURI:", dbURI);
 
 const sequelize = new Sequelize(dbURI, {
   dialect: "postgres",
@@ -16,7 +16,7 @@ const sequelize = new Sequelize(dbURI, {
       require: true,
       rejectUnauthorized: false, // Use false for development; for production, manage certs properly
     },
-    family: 4, // Force IPv4 to avoid IPv6 connection issues
+    family: 4, // Force IPv4
   },
 });
 
