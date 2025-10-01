@@ -4,13 +4,13 @@ const path = require("path");
 const multer = require("multer");
 const fs = require("fs");
 const { promises } = require("dns");
-const { createClient } = require('@supabase/supabase-js');
+const { createClient } = require("@supabase/supabase-js");
 
 // const formidable = require("formidable");
 
 // Initialize Supabase client
-const supabaseUrl = process.env.SUPABASE_URL || 'your-supabase-url';
-const supabaseKey = process.env.SUPABASE_ANON_KEY || 'your-supabase-anon-key';
+const supabaseUrl = process.env.PG_DB_URI || "your-supabase-url";
+const supabaseKey = process.env.SUPABASE_ANON_KEY || "your-supabase-anon-key";
 const supabase = createClient(supabaseUrl, supabaseKey);
 
 const generateNumber = (length) => {
@@ -45,19 +45,19 @@ const uploads = async (req, res) => {
 
       // Upload to Supabase Storage
       const { data, error } = await supabase.storage
-        .from('images') // Replace 'images' with your bucket name
+        .from("images") // Replace 'images' with your bucket name
         .upload(imageName, file.data, {
           contentType: file.mimetype,
         });
 
       if (error) {
-        console.error('Supabase upload error:', error);
+        console.error("Supabase upload error:", error);
         return res.status(500).json({ message: "Upload to Supabase failed" });
       }
 
       // Get public URL
       const { data: publicUrlData } = supabase.storage
-        .from('images')
+        .from("images")
         .getPublicUrl(imageName);
 
       const publicUrl = publicUrlData.publicUrl;
@@ -84,11 +84,11 @@ const getGallery = async (req, res) => {
     const imagesWithSignedUrls = await Promise.all(
       images.map(async (image) => {
         const { data, error } = await supabase.storage
-          .from('images')
+          .from("images")
           .createSignedUrl(image.products_url, 3600); // 1 hour expiration
 
         if (error) {
-          console.error('Error creating signed URL:', error);
+          console.error("Error creating signed URL:", error);
           return { ...image.dataValues, products_url: null }; // or handle error
         }
 
