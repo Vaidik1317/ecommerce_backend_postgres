@@ -1,175 +1,178 @@
 /**
  * @swagger
  * components:
- *    schemas:
- *      Products:
- *         type: object
- *         properties:
- *           u_id:
- *              type: string
- *              description: Unique id for the Product
- *           name:
- *              type: string
- *              description: Name of product
- *           description:
- *              type: string
- *              description: Description of product
- *           price:
- *              type: integer
- *              description: price of product
- *           quantity:
- *              type: integer
- *              description: quantity of product
- *         example:
- *           u_id: PRODUCT12345
- *           name: samsung A22
- *           description: smart phone
- *           price: 15000
- *           quantity: 1
+ *   schemas:
+ *     Product:
+ *       type: object
+ *       properties:
+ *         product_u_id:
+ *           type: string
+ *           description: Unique identifier for the product (auto-generated).
+ *         name:
+ *           type: string
+ *           description: Name of the product.
+ *         description:
+ *           type: string
+ *           description: Description of the product.
+ *         price:
+ *           type: number
+ *           format: float
+ *           description: Price of the product.
+ *         quantity:
+ *           type: integer
+ *           description: Quantity available.
+ *         products_category_u_id:
+ *           type: string
+ *           description: Unique identifier for the product category.
+ *       example:
+ *         product_u_id: PROD1234
+ *         name: iPhone 13
+ *         description: Latest Apple iPhone model
+ *         price: 999.99
+ *         quantity: 10
+ *         products_category_u_id: CATEGORY1234
+ *     ProductCreate:
+ *       type: object
+ *       required:
+ *         - name
+ *         - description
+ *         - price
+ *         - quantity
+ *         - products_category_u_id
+ *       properties:
+ *         name:
+ *           type: string
+ *           description: Name of the product.
+ *         description:
+ *           type: string
+ *           description: Description of the product.
+ *         price:
+ *           type: number
+ *           format: float
+ *           description: Price of the product.
+ *         quantity:
+ *           type: integer
+ *           description: Quantity available.
+ *         products_category_u_id:
+ *           type: string
+ *           description: Unique identifier for the product category.
+ *       example:
+ *         name: iPhone 13
+ *         description: Latest Apple iPhone model
+ *         price: 999.99
+ *         quantity: 10
+ *         products_category_u_id: CATEGORY1234
  */
 /**
  * @swagger
  * tags:
- *   name: Product
- *   description: Products management API
+ *   name: Products
+ *   description: Product management API
  */
-
 /**
  * @swagger
  * /api/getProducts:
  *   get:
- *     summary: List all users
- *     tags: [Product]
- *     security:
- *       - bearerAuth: []
- *     parameters:
- *       - in: query
- *         name:
- *             type: string
- *             description: name of users
- *         description:
-
- *              type: string
- *              description: Description of product
- *         price:
- 
- *            type: integer
- *            description: price of product
- *         quantity:
-
- *            type: integer
- *            description: quantity of product
- *
+ *     summary: Get all products
+ *     tags: [Products]
  *     responses:
  *       200:
- *         description: Users retrieved successfully.
+ *         description: List of products retrieved successfully
  *         content:
  *           application/json:
  *             schema:
- *               type: array
- *               items:
- *                 $ref: '#/components/schemas/Admin'
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/Product'
  *       500:
- *         description: Something went wrong.
+ *         description: Not found
  */
-
 /**
  * @swagger
  * /api/createProducts:
  *   post:
- *     summary: create a new product
- *     tags: [Product]
- *     security:
- *       - bearerAuth: []
+ *     summary: Create a new product
+ *     tags: [Products]
  *     requestBody:
  *       required: true
  *       content:
  *         application/json:
  *           schema:
- *             type: object
- *             properties:
- *               name:
- *                   type: string
- *                   description: name of users
- *               description:
- *                    type: string
- *                    description: Description of product
- *               price:
- *                  type: integer
- *                  description: price of product
- *               quantity:
- *                  type: integer
- *                  description: quantity of product
- *
+ *             $ref: '#/components/schemas/ProductCreate'
  *     responses:
- *       200:
- *         description: Products retrieved successfully.
+ *       201:
+ *         description: Product created successfully
  *         content:
  *           application/json:
  *             schema:
- *               type: array
- *               items:
- *                 $ref: '#/components/schemas/Admin'
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                 data:
+ *                   $ref: '#/components/schemas/Product'
  *       500:
- *         description: Something went wrong.
+ *         description: Failed to create product
  */
 /**
  * @swagger
- * /api/updateProducts:
+ * /api/updateProducts/{product_u_id}:
  *   put:
- *     summary: update a product
- *     tags: [Product]
- *     security:
- *       - bearerAuth: []
+ *     summary: Update an existing product
+ *     tags: [Products]
  *     parameters:
- *       - in: query
- *         name:
- *             type: string
- *             description: name of users
- *         description:
-
- *              type: string
- *              description: Description of product
- *         price:
- 
- *            type: integer
- *            description: price of product
- *         quantity:
-
- *            type: integer
- *            description: quantity of product
- *
+ *       - in: path
+ *         name: product_u_id
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: Product ID
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/Product'
  *     responses:
  *       200:
- *         description: Products retrieved successfully.
+ *         description: Product updated successfully
  *         content:
  *           application/json:
  *             schema:
- *               type: array
- *               items:
- *                 $ref: '#/components/schemas/Admin'
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                 data:
+ *                   $ref: '#/components/schemas/Product'
+ *       404:
+ *         description: Product not found
  *       500:
- *         description: Something went wrong.
+ *         description: Failed to update product
  */
 /**
  * @swagger
- * /api/deleteProducts:
+ * /api/deleteProducts/{product_u_id}:
  *   delete:
- *     summary: delete products
- *     tags: [Product]
- *     security:
- *       - bearerAuth: []
-
- *
+ *     summary: Delete a product
+ *     tags: [Products]
+ *     parameters:
+ *       - in: path
+ *         name: product_u_id
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: Product ID
  *     responses:
  *       200:
- *         description: Products deleted successfully.
- *         content:
- *           application/json:
- *             schema:
- *               type: array
- *               items:
- *                 $ref: '#/components/schemas/Admin'
+ *         description: Product deleted successfully
+ *       404:
+ *         description: Product not found
  *       500:
- *         description: Something went wrong.
+ *         description: Something went wrong
  */

@@ -7,7 +7,7 @@
  *       properties:
  *         u_id:
  *           type: string
- *           description: Unique identifier for the user.
+ *           description: Unique identifier for the user (auto-generated).
  *         name:
  *           type: string
  *           description: Name of the user.
@@ -41,6 +41,51 @@
  *         name: John Doe
  *         email: johndoe@example.com
  *         password: "hashedpassword"
+ *         address: 123 Example Lane
+ *         city: Anand
+ *         state: Gujarat
+ *         country: India
+ *         pincode: "380001"
+ *         gender: male
+ *     UserCreate:
+ *       type: object
+ *       required:
+ *         - name
+ *         - email
+ *         - password
+ *       properties:
+ *         name:
+ *           type: string
+ *           description: Name of the user.
+ *         email:
+ *           type: string
+ *           description: Email of the user.
+ *         password:
+ *           type: string
+ *           description: Password of the user (will be hashed).
+ *         address:
+ *           type: string
+ *           description: Address of the user.
+ *         city:
+ *           type: string
+ *           description: City name of user's address.
+ *         state:
+ *           type: string
+ *           description: State name of user's address.
+ *         country:
+ *           type: string
+ *           description: Country of user's address.
+ *         pincode:
+ *           type: string
+ *           description: Pincode of user's address.
+ *         gender:
+ *           type: string
+ *           enum: [male, female, other]
+ *           description: Gender of the user.
+ *       example:
+ *         name: John Doe
+ *         email: johndoe@example.com
+ *         password: "password123"
  *         address: 123 Example Lane
  *         city: Anand
  *         state: Gujarat
@@ -90,7 +135,7 @@
  *       content:
  *         application/json:
  *           schema:
- *             $ref: '#/components/schemas/User'
+ *             $ref: '#/components/schemas/UserCreate'
  *     responses:
  *       201:
  *         description: User created successfully

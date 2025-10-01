@@ -7,7 +7,7 @@
  *       properties:
  *         u_id:
  *           type: string
- *           description: Unique identifier for the admin.
+ *           description: Unique identifier for the admin (auto-generated).
  *         name:
  *           type: string
  *           description: Name of the admin.
@@ -29,6 +29,34 @@
  *         mobile: "1234567890"
  *         email: johndoe@example.com
  *         password: "$2b$10$hashedPasswordExample"
+ *         role_u_id: ROLE12345
+ *     AdminCreate:
+ *       type: object
+ *       required:
+ *         - name
+ *         - email
+ *         - password
+ *       properties:
+ *         name:
+ *           type: string
+ *           description: Name of the admin.
+ *         mobile:
+ *           type: string
+ *           description: Mobile number of the admin.
+ *         email:
+ *           type: string
+ *           description: Email of the admin.
+ *         password:
+ *           type: string
+ *           description: Password of the admin (will be hashed).
+ *         role_u_id:
+ *           type: string
+ *           description: Role identifier associated with the admin.
+ *       example:
+ *         name: John Doe
+ *         mobile: "1234567890"
+ *         email: johndoe@example.com
+ *         password: "password123"
  *         role_u_id: ROLE12345
  */
 

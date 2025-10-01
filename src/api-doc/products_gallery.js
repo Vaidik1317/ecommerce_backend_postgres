@@ -88,5 +88,5 @@
  *                   items:
  *                     $ref: '#/components/schemas/ProductsGallery'
  *       500:
- *         description: Server error while fetching gallery
+ *         description: Not found
  */

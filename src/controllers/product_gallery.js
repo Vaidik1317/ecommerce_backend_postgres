@@ -4,8 +4,14 @@ const path = require("path");
 const multer = require("multer");
 const fs = require("fs");
 const { promises } = require("dns");
+const { createClient } = require('@supabase/supabase-js');
 
 // const formidable = require("formidable");
+
+// Initialize Supabase client
+const supabaseUrl = process.env.SUPABASE_URL || 'your-supabase-url';
+const supabaseKey = process.env.SUPABASE_ANON_KEY || 'your-supabase-anon-key';
+const supabase = createClient(supabaseUrl, supabaseKey);
 
 const generateNumber = (length) => {
   let result = "";
@@ -30,68 +36,67 @@ const uploads = async (req, res) => {
       ? req.files.products_url
       : [req.files.products_url];
 
-    // let images = Date.now() + "_" + req.files.products_url;
-    // const newPath = path.join(process.cwd(), "test", images);
-    // console.log("🚀 ~ uploads ~ images:", images);
-    // req.files.products_url.mv(newPath);
-
-    // if (
-    //   req.files.products_url.mimetype === "image/jpg" ||
-    //   req.files.products_url.mimetype === "image/png" ||
-    //   req.files.products_url.mimetype === "image/jpeg" ||
-    //   req.files.products_url.mimetype === "application/pdf"
-    // ) {
-
     for (let file of files) {
       const generateName = generateNumber(10);
       let imageName =
         file.mimetype === "application/pdf"
           ? `PRO-IMG-${generateName}.pdf`
           : `PRO-IMG-${generateName}.png`;
-      if (!fs.existsSync("public/upload")) {
-        fs.mkdirSync("public/upload", { recursive: true });
+
+      // Upload to Supabase Storage
+      const { data, error } = await supabase.storage
+        .from('images') // Replace 'images' with your bucket name
+        .upload(imageName, file.data, {
+          contentType: file.mimetype,
+        });
+
+      if (error) {
+        console.error('Supabase upload error:', error);
+        return res.status(500).json({ message: "Upload to Supabase failed" });
       }
 
-      // for()
-      await new Promise((resolve, reject) => {
-        file.mv(`public/upload/${imageName}`, (err) => {
-          if (err) reject(err);
-          else resolve();
-        });
-      });
+      // Get public URL
+      const { data: publicUrlData } = supabase.storage
+        .from('images')
+        .getPublicUrl(imageName);
 
-      // ✅ Check for missing `products_u_id`
-      // if (!req.body.products_u_id) {
-      //   return res.status(400).json({ message: "Missing products_u_id" });
-      // }
+      const publicUrl = publicUrlData.publicUrl;
 
+      // Save file name to database (not full URL since bucket will be private)
       await productsGalleryModel.create({
-        products_url: `public/upload/` + imageName,
+        products_url: imageName,
         products_u_id: req.body.products_u_id,
       });
     }
 
     return res.status(201).json({ message: "success" });
   } catch (error) {
-    console.log("🚀 ~ .replace ~ error:", error);
+    console.log("🚀 ~ uploads ~ error:", error);
+    res.status(500).json({ message: "error" });
   }
-  // if (req.files.products_url > 10) {
-  //   images = `${req.files.products_url.substring(0, 20).replace(".", "_")}_.${
-  //     req.files.products_url.split(".")[1]
-  //   }`;
-  //   console.log(images, "imagess");
-  // }
-
-  res.status(500).json({ message: "error" });
-  // console.log("🚀 ~ products_url:", products_url);
 };
 // fetch
 const getGallery = async (req, res) => {
   try {
-    const getUrl = await productsGalleryModel.findAll({});
+    const images = await productsGalleryModel.findAll({});
 
-    // console.log("🚀 ~ getGallery ~ getUrl:", getUrl);
-    res.status(201).json({ success: true, data: getUrl });
+    // Generate signed URLs for each image
+    const imagesWithSignedUrls = await Promise.all(
+      images.map(async (image) => {
+        const { data, error } = await supabase.storage
+          .from('images')
+          .createSignedUrl(image.products_url, 3600); // 1 hour expiration
+
+        if (error) {
+          console.error('Error creating signed URL:', error);
+          return { ...image.dataValues, products_url: null }; // or handle error
+        }
+
+        return { ...image.dataValues, products_url: data.signedUrl };
+      })
+    );
+
+    res.status(201).json({ success: true, data: imagesWithSignedUrls });
   } catch (error) {
     console.log("Error in fetching product gallery:", error.message);
     res.status(500).json({ success: false, message: "Not found" });
