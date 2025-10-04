@@ -87,9 +87,15 @@ const getGallery = async (req, res) => {
 
     // Generate public URLs for each image (assuming bucket is public)
     const imagesWithUrls = images.map((image) => {
+      // Clean the products_url by removing any leading "public/upload/" if present
+      let cleanPath = image.products_url;
+      if (cleanPath.startsWith("public/upload/")) {
+        cleanPath = cleanPath.replace("public/upload/", "");
+      }
+
       const { data: publicUrlData } = supabase.storage
         .from("images")
-        .getPublicUrl(image.products_url);
+        .getPublicUrl(cleanPath);
 
       return { ...image.dataValues, products_url: publicUrlData.publicUrl };
     });
