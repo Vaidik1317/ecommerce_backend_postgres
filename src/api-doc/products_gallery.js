@@ -90,3 +90,34 @@
  *       500:
  *         description: Not found
  */
+
+/**
+ * @swagger
+ * /api/deleteGallery/{id}:
+ *   delete:
+ *     summary: Delete a product gallery item by ID
+ *     tags: [Gallery]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Unique identifier of the gallery item to delete
+ *         example: 1
+ *     responses:
+ *       200:
+ *         description: Image deleted successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Image deleted successfully
+ *       404:
+ *         description: Image not found
+ *       500:
+ *         description: Internal server error
+ */

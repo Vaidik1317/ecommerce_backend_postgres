@@ -10,7 +10,7 @@ const { createClient } = require("@supabase/supabase-js");
 
 // Initialize Supabase client
 const supabaseUrl = process.env.SUPABASE_URL || "your-supabase-url";
-const supabaseKey = process.env.SUPABASE_ANON_KEY || "your-supabase-anon-key";
+const supabaseKey = process.env.SERVICE_ROLE || "your-supabase-anon-key";
 const supabase = createClient(supabaseUrl, supabaseKey);
 
 const generateNumber = (length) => {
@@ -38,10 +38,15 @@ const uploads = async (req, res) => {
 
     for (let file of files) {
       const generateName = generateNumber(10);
-      let imageName =
-        file.mimetype === "application/pdf"
-          ? `PRO-IMG-${generateName}.pdf`
-          : `PRO-IMG-${generateName}.png`;
+      let imageName;
+      if (file.mimetype === "application/pdf") {
+        imageName = `PRO-IMG-${generateName}.pdf`;
+      } else if (file.mimetype.startsWith("image/")) {
+        const extension = file.mimetype.split("/")[1]; // e.g., 'webp', 'png', 'jpg'
+        imageName = `PRO-IMG-${generateName}.${extension}`;
+      } else {
+        imageName = `PRO-IMG-${generateName}.png`; // fallback
+      }
 
       // Upload to Supabase Storage
       const { data, error } = await supabase.storage
@@ -80,23 +85,16 @@ const getGallery = async (req, res) => {
   try {
     const images = await productsGalleryModel.findAll({});
 
-    // Generate signed URLs for each image
-    const imagesWithSignedUrls = await Promise.all(
-      images.map(async (image) => {
-        const { data, error } = await supabase.storage
-          .from("images")
-          .createSignedUrl(image.products_url, 3600); // 1 hour expiration
+    // Generate public URLs for each image (assuming bucket is public)
+    const imagesWithUrls = images.map((image) => {
+      const { data: publicUrlData } = supabase.storage
+        .from("images")
+        .getPublicUrl(image.products_url);
 
-        if (error) {
-          console.error("Error creating signed URL:", error);
-          return { ...image.dataValues, products_url: null }; // or handle error
-        }
+      return { ...image.dataValues, products_url: publicUrlData.publicUrl };
+    });
 
-        return { ...image.dataValues, products_url: data.signedUrl };
-      })
-    );
-
-    res.status(201).json({ success: true, data: imagesWithSignedUrls });
+    res.status(201).json({ success: true, data: imagesWithUrls });
   } catch (error) {
     console.log("Error in fetching product gallery:", error.message);
     res.status(500).json({ success: false, message: "Not found" });
@@ -124,9 +122,41 @@ const getGallery = async (req, res) => {
 //     console.log("newGallery - error", error);
 //   }
 // };
+// delete
+const deleteImage = async (req, res) => {
+  try {
+    const { id } = req.params; // id is the u_id from gallery table
+
+    // Find the image in database
+    const image = await productsGalleryModel.findByPk(id);
+    if (!image) {
+      return res.status(404).json({ message: "Image not found" });
+    }
+
+    // Delete from Supabase Storage
+    const { error } = await supabase.storage
+      .from("images")
+      .remove([image.products_url]);
+
+    if (error) {
+      console.error("Supabase delete error:", error);
+      return res.status(500).json({ message: "Failed to delete from storage" });
+    }
+
+    // Delete from database
+    await image.destroy();
+
+    res.status(200).json({ message: "Image deleted successfully" });
+  } catch (error) {
+    console.log("Error deleting image:", error);
+    res.status(500).json({ message: "Error deleting image" });
+  }
+};
+
 module.exports.productsGalleryController = {
   getGallery,
   // createGallery,
   // generateNumber,
   uploads,
+  deleteImage,
 };

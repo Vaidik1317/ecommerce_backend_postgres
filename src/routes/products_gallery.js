@@ -7,6 +7,7 @@ module.exports = (app, router) => {
     productsGalleryController.uploads
     // productsGalleryController.createGallery
   );
+  router.delete("/deleteGallery/:id", productsGalleryController.deleteImage);
 
   app.use("/api", router);
 };
