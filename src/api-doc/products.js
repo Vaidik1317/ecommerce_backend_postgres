@@ -21,6 +21,9 @@
  *         quantity:
  *           type: integer
  *           description: Quantity available.
+ *         color:
+ *           type: string
+ *           description: Color of the product.
  *         products_category_u_id:
  *           type: string
  *           description: Unique identifier for the product category.
@@ -28,8 +31,9 @@
  *         product_u_id: PROD1234
  *         name: iPhone 13
  *         description: Latest Apple iPhone model
- *         price: 999.99
+ *         price: 999
  *         quantity: 10
+ *         color: red
  *         products_category_u_id: CATEGORY1234
  *     ProductCreate:
  *       type: object
@@ -53,14 +57,18 @@
  *         quantity:
  *           type: integer
  *           description: Quantity available.
+ *         color:
+ *           type: string
+ *           description: Color of the product.
  *         products_category_u_id:
  *           type: string
  *           description: Unique identifier for the product category.
  *       example:
  *         name: iPhone 13
  *         description: Latest Apple iPhone model
- *         price: 999.99
+ *         price: 999
  *         quantity: 10
+ *         color: red
  *         products_category_u_id: CATEGORY1234
  */
 /**

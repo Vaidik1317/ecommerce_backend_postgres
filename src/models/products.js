@@ -29,6 +29,10 @@ module.exports = (sequelize, Sequelize) => {
         type: Sequelize.INTEGER,
         allowNull: false,
       },
+      color: {
+        type: Sequelize.STRING,
+        allowNull: true,
+      },
     },
     {
       id: false,

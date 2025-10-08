@@ -37,6 +37,7 @@ const createProducts = async (req, res) => {
         description: req.body.description,
         price: req.body.price,
         quantity: req.body.quantity,
+        color: req.body.color,
         products_category_u_id: req.body.products_category_u_id,
       }
       // { transaction }
@@ -104,6 +105,7 @@ const updateProducts = async (req, res) => {
       (product.description = req.body.description),
       (product.price = req.body.price),
       (product.quantity = req.body.quantity),
+      (product.color = req.body.color),
       (product.category_id = req.body.category_id),
       await product.save({});
 

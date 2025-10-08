@@ -85,20 +85,27 @@ const getGallery = async (req, res) => {
   try {
     const images = await productsGalleryModel.findAll({});
 
-    // Generate public URLs for each image (assuming bucket is public)
-    const imagesWithUrls = images.map((image) => {
+    // Generate signed URLs for each image (bucket can be private)
+    const imagesWithUrls = await Promise.all(images.map(async (image) => {
       // Clean the products_url by removing any leading "public/upload/" if present
       let cleanPath = image.products_url;
       if (cleanPath.startsWith("public/upload/")) {
         cleanPath = cleanPath.replace("public/upload/", "");
       }
 
-      const { data: publicUrlData } = supabase.storage
-        .from("images")
-        .getPublicUrl(cleanPath);
+      console.log("Creating signed URL for:", cleanPath);
 
-      return { ...image.dataValues, products_url: publicUrlData.publicUrl };
-    });
+      const { data: signedUrlData, error } = await supabase.storage
+        .from("images")
+        .createSignedUrl(cleanPath, 3600); // Expires in 1 hour (3600 seconds)
+
+      if (error) {
+        console.error("Error creating signed URL for", cleanPath, ":", error);
+        return { ...image.dataValues, products_url: null }; // Handle error
+      }
+
+      return { ...image.dataValues, products_url: signedUrlData.signedUrl };
+    }));
 
     res.status(201).json({ success: true, data: imagesWithUrls });
   } catch (error) {
