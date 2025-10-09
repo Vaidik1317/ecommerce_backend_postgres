@@ -94,7 +94,7 @@ const updateProducts = async (req, res) => {
 
   try {
     const product = await products.findOne({
-      where: { product_u_id: req.params.product_u_id },
+      where: { u_id: req.params.u_id },
     });
 
     if (!product) {
@@ -125,21 +125,22 @@ const deleteProducts = async (req, res) => {
   // const transaction = await sequelize.transaction();
   try {
     const product = await products.findOne({
-      where: { product_id: req.params.product_id },
+      where: { u_id: req.params.u_id },
     });
+    console.log("🚀 ~ deleteProducts ~ product:", product);
 
     if (!product) {
       res.status(404).json({ success: false, message: "not found" });
     }
 
     await products.destroy({
-      where: { product_id: req.params.product_id },
-      transaction,
+      where: { u_id: req.params.u_id },
     });
 
     // await transaction.commit();
     res.status(200).json({ success: true, data: product });
   } catch (error) {
+    console.log("🚀 ~ deleteProducts ~ error:", error);
     // await transaction.rollback();
 
     res.status(500).json({ success: false, message: "Something went wrong" });

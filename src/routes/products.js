@@ -4,8 +4,8 @@ const { productsController } = require("../controllers/products");
 module.exports = (app, router) => {
   router.get("/getProducts", productsController.getProducts);
   router.post("/createProducts", productsController.createProducts);
-  router.put("/updateProducts", productsController.updateProducts);
-  router.delete("/deleteProducts", productsController.deleteProducts);
+  router.put("/updateProducts/:u_id", productsController.updateProducts);
+  router.delete("/deleteProducts/:u_id", productsController.deleteProducts);
 
   app.use("/api", router);
 };
