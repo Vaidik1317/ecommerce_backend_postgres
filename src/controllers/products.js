@@ -106,7 +106,7 @@ const updateProducts = async (req, res) => {
       (product.price = req.body.price),
       (product.quantity = req.body.quantity),
       (product.color = req.body.color),
-      (product.category_id = req.body.category_id),
+      (product.products_category_u_id = req.body.products_category_u_id),
       await product.save({});
 
     // await transaction.commit();

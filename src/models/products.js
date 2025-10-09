@@ -33,6 +33,10 @@ module.exports = (sequelize, Sequelize) => {
         type: Sequelize.STRING,
         allowNull: true,
       },
+      products_category_u_id: {
+        type: Sequelize.UUID,
+        allowNull: true,
+      },
     },
     {
       id: false,
