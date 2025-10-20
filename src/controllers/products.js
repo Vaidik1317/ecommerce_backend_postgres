@@ -96,22 +96,20 @@ const updateProducts = async (req, res) => {
     const product = await products.findOne({
       where: { u_id: req.params.u_id },
     });
+    console.log("🚀 ~ updateProducts ~ product:", product);
 
     if (!product) {
       res.status(404).json({ success: false, message: "not found" });
     }
 
-    (product.name = req.body.name),
-      (product.description = req.body.description),
-      (product.price = req.body.price),
-      (product.quantity = req.body.quantity),
-      (product.color = req.body.color),
-      (product.products_category_u_id = req.body.products_category_u_id),
-      await product.save({});
+    const productUpdate = await products.update(req.body, {
+      where: { u_id: req.params.u_id },
+    });
 
     // await transaction.commit();
-    res.status(200).json({ success: true, data: product });
+    res.status(200).json({ success: true, data: productUpdate });
   } catch (error) {
+    console.log("🚀 ~ updateProducts ~ error:", error);
     // await transaction.rollback();
 
     res

@@ -6,7 +6,7 @@ module.exports = (app, router) => {
   // router.get("/report", orderController.loadReport);
   router.get("/invoicePdf", orderController.invoicePdf);
   router.post("/createOrders", orderController.createOrders);
-  router.delete("/deleteOrder", orderController.deleteOrders);
+  router.delete("/deleteOrder/:u_id", orderController.deleteOrders);
 
   app.use("/api", router);
 };

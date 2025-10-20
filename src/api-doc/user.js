@@ -17,6 +17,9 @@
  *         password:
  *           type: string
  *           description: Hashed password of the user.
+ *         number:
+ *           type: string
+ *           description: number of the user.
  *         address:
  *           type: string
  *           description: Address of the user.
@@ -41,6 +44,7 @@
  *         name: John Doe
  *         email: johndoe@example.com
  *         password: "hashedpassword"
+ *         number: 9911223344
  *         address: 123 Example Lane
  *         city: Anand
  *         state: Gujarat
@@ -63,6 +67,9 @@
  *         password:
  *           type: string
  *           description: Password of the user (will be hashed).
+ *         number:
+ *           type: string
+ *           description: number of the user.
  *         address:
  *           type: string
  *           description: Address of the user.
@@ -86,6 +93,7 @@
  *         name: John Doe
  *         email: johndoe@example.com
  *         password: "password123"
+ *         number: 9911223344
  *         address: 123 Example Lane
  *         city: Anand
  *         state: Gujarat
@@ -176,6 +184,8 @@
  *                 type: string
  *               email:
  *                 type: string
+ *               number:
+ *                 type: string
  *               address:
  *                 type: string
  *               city:
@@ -205,7 +215,7 @@
  *       500:
  *         description: Failed to update user
  */
-
+ 
 /**
  * @swagger
  * /api/deleteUsers/{u_id}:
@@ -277,6 +287,89 @@
  *         description: User not found
  *       500:
  *         description: Error logging in
+ */
+
+/**
+ * @swagger
+ * /api/getUserOrders:
+ *   get:
+ *     summary: Get authenticated user's order history
+ *     tags: [Users]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: User's orders retrieved successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       u_id:
+ *                         type: string
+ *                         description: Order ID
+ *                       user_u_id:
+ *                         type: string
+ *                         description: User ID
+ *                       total_price:
+ *                         type: number
+ *                         description: Total order price
+ *                       status:
+ *                         type: string
+ *                         description: Order status
+ *                       date:
+ *                         type: string
+ *                         description: Order date
+ *                       created_at:
+ *                         type: string
+ *                         format: date-time
+ *                         description: Order creation timestamp
+ *                       items:
+ *                         type: array
+ *                         items:
+ *                           type: object
+ *                           properties:
+ *                             u_id:
+ *                               type: string
+ *                               description: Order item ID
+ *                             products_u_id:
+ *                               type: string
+ *                               description: Product ID
+ *                             price:
+ *                               type: number
+ *                               description: Item price
+ *                             quantity:
+ *                               type: integer
+ *                               description: Item quantity
+ *                             product:
+ *                               type: object
+ *                               properties:
+ *                                 u_id:
+ *                                   type: string
+ *                                   description: Product ID
+ *                                 name:
+ *                                   type: string
+ *                                   description: Product name
+ *                                 description:
+ *                                   type: string
+ *                                   description: Product description
+ *                                 price:
+ *                                   type: number
+ *                                   description: Product price
+ *                                 image:
+ *                                   type: string
+ *                                   description: Product image URL
+ *       401:
+ *         description: Unauthorized - Invalid or missing token
+ *       500:
+ *         description: Failed to fetch orders
  */
 
 /**

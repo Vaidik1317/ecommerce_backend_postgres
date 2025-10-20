@@ -70,7 +70,7 @@ const createOrders = async (req, res) => {
       // product_u_id: req.body.products_u_id,
       total_price: totalPrices,
       status: req.body.status,
-      date: moment().format("YYYY/MM/DD"),
+      date: moment().format("YYYY-MM-DD"),
     });
 
     if (!createOrder) {
@@ -115,12 +115,57 @@ const createOrders = async (req, res) => {
         .status(404)
         .json({ success: false, message: "user email not found" });
     }
+
+    // Format order details with comprehensive product information
+    const orderDetails = await Promise.all(
+      req.body.order_item.map(async (item) => {
+        const product = await products.findOne({
+          where: { u_id: item.products_u_id },
+        });
+        return {
+          productName: product ? product.name : "Unknown Product",
+          description: product ? product.description : "No description",
+          price: item.price,
+          quantity: item.quantity,
+          color: product ? product.color : "N/A",
+          subtotal: item.price * item.quantity,
+        };
+      })
+    );
+
+    const orderSummary = orderDetails
+      .map(
+        (item) =>
+          `${item.productName} - ${item.description} (Color: ${item.color}, Price: ${item.price}, Quantity: ${item.quantity}, Subtotal: ${item.subtotal})`
+      )
+      .join("\n");
+
+    const emailBody = `Hi ${userEmail.name},
+
+Thank you for placing your order!
+
+Order Details:
+Order ID: ${createOrder.u_id}
+Order Date: ${moment().format("YYYY-MM-DD")}
+Order Status: ${createOrder.status}
+Total Amount: ${createOrder.total_price}
+
+Items Ordered:
+${orderSummary}
+
+Delivery Information:
+Your order will be delivered within 5 to 7 working days.
+You will receive tracking information once your order ships.
+
+We appreciate your business and will process your order shortly.
+
+Best regards,
+Ecommerce Team`;
+
     sendMail(
       userEmail.email,
-      "welcome to our site ,Thank you for placing order",
-      `Hi your order details are ${JSON.stringify(
-        req.body.order_item
-      )}, Thank you`
+      "Order Confirmation - Thank you for your purchase",
+      emailBody
     );
     console.log("🚀 ~ createOrders ~ sendMail:", sendMail);
     // sendMail(
@@ -140,24 +185,25 @@ const createOrders = async (req, res) => {
   // console.log("🚀 ~ createOrders ~ orderData:", orderData);
 };
 
-const deleteOrders = async () => {
+const deleteOrders = async (req, res) => {
   // const transaction = await sequelize.transaction();
 
   try {
-    const order = await order.findOne({
-      where: { order_id: req.params.order_id },
+    const orderDelete = await order.findOne({
+      where: { u_id: req.params.u_id },
     });
 
-    if (!order) {
-      res.status(404).json({ success: false, message: "not found" });
+    if (!orderDelete) {
+      return res.status(404).json({ success: false, message: "not found" });
     }
 
     await order.destroy({
-      where: { order_id: req.params.order_id },
+      where: { u_id: req.params.u_id },
     });
-
+    res.status(200).json({ success: true });
     // await transaction.commit();
   } catch (error) {
+    console.log("🚀 ~ deleteOrders ~ error:", error);
     // await transaction.rollback();
     res.status(500).json({ success: false, message: "Something went wrong" });
   }

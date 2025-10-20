@@ -47,7 +47,7 @@
  *           description: Unique identifier of the order
  *       example:
  *         products_u_id: PROD1234
- *         price: 999.99
+ *         price: 999
  *         quantity: 1
  *         order_u_id: ORDER12345
  */
@@ -132,7 +132,7 @@
  *             example:
  *               order_item:
  *                 - products_u_id: PROD1234
- *                   price: 999.99
+ *                   price: 999
  *                   quantity: 1
  *               user_u_id: USER1234
  *               status: pending
@@ -155,13 +155,13 @@
  */
 /**
  * @swagger
- * /api/deleteOrder:
+ * /api/deleteOrder/{u_id}:
  *   delete:
  *     summary: Delete an order
  *     tags: [Orders]
  *     parameters:
- *       - in: query
- *         name: order_id
+ *       - in: path
+ *         name: u_id
  *         schema:
  *           type: string
  *         required: true

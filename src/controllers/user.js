@@ -22,6 +22,7 @@ const createUsers = async (req, res, next) => {
     name,
     email,
     password,
+    number,
     address,
     city,
     state,
@@ -36,6 +37,7 @@ const createUsers = async (req, res, next) => {
       name,
       email,
       password: hashedPassword,
+      number,
       address,
       city,
       state,
@@ -66,26 +68,15 @@ const updateUsers = async (req, res) => {
   try {
     const userData = await user.findOne({ where: { u_id: req.params.u_id } });
 
-    // if (!userData) {
-    //   return res.state(404).json({ success: false, message: "not found" });
-    // }
-
-    // (userData.name = req.body.name),
-    //   (userData.email = req.body.email),
-    //   (userData.password = req.body.password),
-    //   (userData.address = req.body.address),
-    //   (userData.city = req.body.city),
-    //   (userData.state = req.body.state),
-    //   (userData.country = req.body.country),
-    //   (userData.pincode = req.body.pincode),
-    //   (userData.gender = req.body.gender),
+    if (!userData) {
+      return res.status(404).json({ success: false, message: "User not found" });
+    }
 
     const UpdateUser = await user.update(req.body, {
       where: { u_id: req.params.u_id },
     });
-    await userData.save();
 
-    res.status(201).json({ success: true, data: UpdateUser });
+    res.status(200).json({ success: true, data: UpdateUser });
   } catch (error) {
     console.log("🚀 ~ updateUsers ~ error:", error);
 
@@ -106,7 +97,7 @@ const deleteUsers = async (req, res) => {
     await user.destroy({
       where: { u_id: req.params.u_id },
     });
-    res.status(201).json({ success: true });
+    res.status(200).json({ success: true });
   } catch (error) {
     console.log("🚀 ~ deleteUsers ~ error:", error);
 
@@ -115,8 +106,6 @@ const deleteUsers = async (req, res) => {
 };
 
 const login = async (req, res) => {
-  console.log("🚀 ~ login ~ login:", login);
-
   const { email, password } = req.body;
 
   try {
@@ -136,12 +125,21 @@ const login = async (req, res) => {
         .json({ success: false, message: "Invalid password" });
     }
 
-    // Create JWT token with user ID and maybe email or name if needed
+    // Create JWT token with user ID and email
     const token = jwt.sign(
       { userId: loginUser.u_id, email: loginUser.email },
-      "012efgh",
+      process.env.JWT_SECRET || "012efgh",
       {
         expiresIn: "7h",
+      }
+    );
+
+    // Create refresh token (longer expiry)
+    const refreshToken = jwt.sign(
+      { userId: loginUser.u_id },
+      process.env.JWT_REFRESH_SECRET || "refresh_secret_012efgh",
+      {
+        expiresIn: "30d",
       }
     );
 
@@ -150,13 +148,13 @@ const login = async (req, res) => {
       u_id: loginUser.u_id,
       name: loginUser.name,
       email: loginUser.email,
+      number: loginUser.number,
       address: loginUser.address,
       city: loginUser.city,
       state: loginUser.state,
       country: loginUser.country,
       pincode: loginUser.pincode,
       gender: loginUser.gender,
-      // add other user fields you want frontend to have
     };
 
     res.status(200).json({
@@ -164,10 +162,93 @@ const login = async (req, res) => {
       message: "Login successful",
       user: userData,
       token,
+      refreshToken,
     });
   } catch (error) {
-    console.error("🚀 ~ login ~ error:", error);
+    console.error("Login error:", error);
     res.status(500).json({ success: false, message: "Error logging in" });
+  }
+};
+
+// Refresh token endpoint
+const refreshToken = async (req, res) => {
+  const { refreshToken: token } = req.body;
+
+  if (!token) {
+    return res
+      .status(401)
+      .json({ success: false, message: "Refresh token required" });
+  }
+
+  try {
+    const decoded = jwt.verify(
+      token,
+      process.env.JWT_REFRESH_SECRET || "refresh_secret_012efgh"
+    );
+    const loginUser = await user.findOne({ where: { u_id: decoded.userId } });
+
+    if (!loginUser) {
+      return res
+        .status(404)
+        .json({ success: false, message: "User not found" });
+    }
+
+    // Generate new access token
+    const newToken = jwt.sign(
+      { userId: loginUser.u_id, email: loginUser.email },
+      process.env.JWT_SECRET || "012efgh",
+      {
+        expiresIn: "7h",
+      }
+    );
+
+    res.status(200).json({
+      success: true,
+      token: newToken,
+    });
+  } catch (error) {
+    console.error("Refresh token error:", error);
+    res.status(401).json({ success: false, message: "Invalid refresh token" });
+  }
+};
+
+// Logout endpoint (for cleanup if needed)
+const logout = async (req, res) => {
+  // With JWT, logout is mainly client-side
+  // But you could implement token blacklisting here if needed
+  res.status(200).json({ success: true, message: "Logged out successfully" });
+};
+
+const getUserOrders = async (req, res) => {
+  try {
+    // Get user ID from JWT token (assuming middleware sets req.user)
+    const userId = req.user?.userId;
+
+    if (!userId) {
+      return res.status(401).json({ success: false, message: "Unauthorized" });
+    }
+
+    const { order: orderModel } = require("../models").db;
+
+    const userOrders = await orderModel.findAll({
+      where: { user_u_id: userId },
+      include: [
+        {
+          model: require("../models").db.items,
+          include: [
+            {
+              model: require("../models").db.product,
+            },
+          ],
+        },
+      ],
+      order: [["created_at", "DESC"]], // Most recent orders first
+    });
+
+    res.status(200).json({ success: true, data: userOrders });
+  } catch (error) {
+    console.error("Error fetching user orders:", error);
+    res.status(500).json({ success: false, message: "Failed to fetch orders" });
   }
 };
 
@@ -197,6 +278,10 @@ const exportUser = async (req, res) => {
       {
         header: "password",
         key: "password",
+      },
+      {
+        header: "number",
+        key: "number",
       },
       {
         header: "address",
@@ -269,5 +354,8 @@ module.exports.usersController = {
   updateUsers,
   deleteUsers,
   login,
+  refreshToken,
+  logout,
+  getUserOrders,
   exportUser,
 };
